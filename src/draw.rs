@@ -45,11 +45,13 @@ impl PianoGlobal {
 
         self.tracks.iter().enumerate().for_each(|(i, t)| {
             if i != self.rtd.sel_track {
-                self.draw_track(t, i );
+                self.draw_track(t, i);
             }
         });
 
-        self.tracks.get(self.rtd.sel_track).map(|t| self.draw_track(t,self.rtd.sel_track));
+        self.tracks
+            .get(self.rtd.sel_track)
+            .map(|t| self.draw_track(t, self.rtd.sel_track));
     }
 
     pub fn draw_insts(&self) {
@@ -100,17 +102,8 @@ impl PianoGlobal {
     }
 
     pub fn draw_track(&self, t: &Track, ti: usize) {
-        let yoffset = self.rtd.borde + ti as f64 *self.rtd.cellh;
+        let yoffset = self.rtd.borde + ti as f64 * self.rtd.cellh;
         let row_styles = [&"#22443322".into(), &"#44223333".into()];
-        //let col_styles = [&"#22448322".into(), &"#22883333".into()];
-        let ins_styles = [
-            &"#9a9dea".into(),
-            &"#7bd4ca".into(),
-            &"#e53e0f".into(),
-            &"#18d579".into(),
-            &"#8cea44".into(),
-            &"#645122".into(),
-        ];
         let c = &self.cctx;
         if t.hide {
             c.set_fill_style(&"green".into());
@@ -132,11 +125,24 @@ impl PianoGlobal {
             self.rtd.cellh - self.rtd.borde * 2f64,
         );
 
-        c.set_fill_style(&"yellow".into());
+        if self.rtd.sel_track == ti {
+            c.set_fill_style(&"orange".into());
+        } else {
+            c.set_fill_style(&"yellow".into());
+        }
+
         c.fill_rect(
             self.rtd.borde + self.rtd.titlw / 2f64,
             yoffset,
-            self.rtd.titlw / 2f64 - self.rtd.borde * 2f64,
+            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
+            self.rtd.cellh - self.rtd.borde * 2f64,
+        );
+
+        c.set_fill_style(&t.colo.as_str().into());
+        c.fill_rect(
+            self.rtd.borde + self.rtd.titlw * 0.75f64,
+            yoffset,
+            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
             self.rtd.cellh - self.rtd.borde * 2f64,
         );
 
@@ -157,7 +163,8 @@ impl PianoGlobal {
             }
 
             // draw cell
-            c.set_fill_style(ins_styles[2]);
+            //c.set_fill_style(ins_styles[2]);
+            c.set_fill_style(&"#e53e0f".into());
             c.fill_rect(
                 xoffset,
                 yoffset + self.rtd.cellh - 3f64,
@@ -169,7 +176,7 @@ impl PianoGlobal {
             [0, 1, 2, 3].iter().fold(0b1000, |mask, _| {
                 if mask & n.beat != 0 {
                     //c.set_fill_style(col_styles[(j + 1) % 2]);
-                    c.set_fill_style(ins_styles[ti]);
+                    c.set_fill_style(&t.colo.as_str().into());
                     c.fill_rect(
                         xoffset,
                         yoffset,

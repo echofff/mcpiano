@@ -49,7 +49,7 @@ impl RuntimeData {
             cellw: 80f64,
             cellh: 20f64,
             borde: 1f64,
-            titlw: 60f64,
+            titlw: 80f64,
             tablw: 1900f64,
             tablh: 1000f64,
         }

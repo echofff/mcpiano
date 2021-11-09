@@ -1,4 +1,4 @@
-use crate::{PianoGlobal, track::Track};
+use crate::{track::Track, PianoGlobal};
 
 use wasm_bindgen::prelude::*;
 
@@ -19,7 +19,7 @@ impl PianoGlobal {
         //log(format!("{}--{}--{}--{}--{}",xlimit,ylimit,x,y,left).as_str());
         //crate::l(format!("{}{}", left, down));
         match (down, (x > xlimit), (y > ylimit), left) {
-            (0 | 1, true, true, 1) =>  self.click_edit(
+            (0 | 1, true, true, 1) => self.click_edit(
                 ((y - ylimit) / self.rtd.cellh as i32) as u8,
                 (x - xlimit) as usize / self.rtd.notew as usize,
                 true,
@@ -70,8 +70,8 @@ impl PianoGlobal {
             let ii = i.inst as u8;
             let mut changed = false;
 
-            if let Some(Track{hide: true,..}) = self.tracks.get(sel_track){
-                return
+            if let Some(Track { hide: true, .. }) = self.tracks.get(sel_track) {
+                return;
             }
 
             if let Some(Some(n)) = self.tracks.get_mut(sel_track).map(|t| t.get_mut(inote)) {

@@ -11,6 +11,7 @@ pub struct Note {
 pub struct Track {
     pub inst: usize,
     pub hide: bool,
+    pub colo: String,
     pub notes: Vec<Note>,
 }
 
@@ -19,7 +20,13 @@ impl Track {
         let notes = vec![Default::default()];
         let inst = 0;
         let hide = false;
-        Track { inst, hide, notes }
+        let colo = String::from("#9a9dea");
+        Track {
+            inst,
+            hide,
+            notes,
+            colo,
+        }
     }
     pub fn deleteable(&self) -> bool {
         self.iter().all(|n| n.beat == 0)
