@@ -2,19 +2,17 @@ mod utils;
 
 mod draw;
 mod event;
+mod export;
 mod map;
 mod play;
+mod saver;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::throw_str;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::CanvasRenderingContext2d;
-use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response}; //// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-                                                                          //// allocator.
-                                                                          //#[cfg(feature = "wee_alloc")]
-                                                                          //#[global_allocator]
-                                                                          //static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
 
 #[wasm_bindgen]
 extern "C" {
@@ -29,7 +27,7 @@ extern "C" {
 struct NoteBox {
     name: String,
     hash: String,
-    size: usize,
+    //size: usize,
 
     #[serde(skip_deserializing)]
     audio: Option<AudioBuffer>,
@@ -37,7 +35,7 @@ struct NoteBox {
 
 #[wasm_bindgen]
 #[derive(Debug)]
-struct Track {
+pub struct Track {
     notes: Vec<Note>,
 }
 
@@ -58,7 +56,6 @@ pub struct PianoGlobal {
     tracks: Vec<Track>,
     insts: Vec<(u8, u8)>,
 
-    tick: i32,
     maxnote: usize,
     pause: bool,
 }
@@ -69,7 +66,6 @@ impl PianoGlobal {
     pub async fn new() -> PianoGlobal {
         let actx = AudioContext::new().unwrap_throw();
         //let mut notes: Vec<NoteBox> = conf.into_serde().unwrap_throw();
-        let tick = 50;
         let pause = false;
 
         let mut opts = RequestInit::new();
@@ -92,11 +88,7 @@ impl PianoGlobal {
         let json = JsFuture::from(resp.json().expect_throw("run->json2")).await;
         //.expect_throw("run->json");
         let json = if let Err(e) = json {
-            let a = format!("{:?}", e);
-            unsafe {
-                log(&a);
-            };
-            throw_str("ffffff")
+            throw_str(format!("{:?}", e).as_str());
         } else {
             json.unwrap()
         };
@@ -108,10 +100,7 @@ impl PianoGlobal {
             //ele.genab(&ctx).await.expect_throw("run-> for");
             let a = ele.genab(&actx).await;
             if let Err(a) = a {
-                let a = format!("---------{:?}", a);
-                unsafe {
-                    log(&a);
-                }
+                throw_str(format!("---------{:?}", a).as_str());
             }
         }
 
@@ -177,10 +166,10 @@ impl PianoGlobal {
 
             maxnote: 24 * 4 * 4,
 
-            tick,
             pause,
         }
     }
+
 }
 
 #[wasm_bindgen]
@@ -188,7 +177,7 @@ impl NoteBox {
     async fn genab(&mut self, ctx: &AudioContext) -> Result<(), JsValue> {
         let mut opts = RequestInit::new();
         opts.method("GET");
-        let urls = format!("/res/{}", self.hash);
+        let urls = format!("./res/{}", self.hash);
 
         let req = Request::new_with_str_and_init(&urls, &opts)?;
         let window = web_sys::window().unwrap();

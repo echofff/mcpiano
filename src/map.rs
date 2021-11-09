@@ -1,4 +1,3 @@
-
 pub const NOTEW: f64 = 20f64;
 pub const CELLW: f64 = 80f64;
 pub const CELLH: f64 = 20f64;
@@ -7,13 +6,13 @@ pub const TITLW: f64 = 60f64;
 pub const TABLW: f64 = 1900f64;
 pub const TABLH: f64 = 1000f64;
 
-pub const TITLE: [&str; 25] = [
+pub const TITLE: [&str; 28] = [
     "0_F#", "1_G", "2_G#", "3_A", "4_A#", "5_B", "6_C", "7_C#", "8_D", "9_D#", "10_E", "11_F",
     "12_F#", "13_G", "14_G#", "15_A", "16_A#", "17_B", "18_C", "19_C#", "20_D", "21_D#", "22_E",
-    "23_F", "24_F#",
+    "23_F", "24_F#", "dummy", "dummy", "dummy",
 ];
 
-pub const SYMBOL: [&str; 26] = [
+pub const SYMBOL: [&str; 28] = [
     "minecraft:white_concrete",
     "minecraft:orange_concrete",
     "minecraft:magenta_concrete",
@@ -40,9 +39,15 @@ pub const SYMBOL: [&str; 26] = [
     "minecraft:gray_concrete_powder",
     "minecraft:light_gray_concrete_powder",
     "minecraft:stone",
+    "minecraft:birch_fence",
+    "minecraft:spruce_fence",
+];
+pub const TIME_MARK_NAME: [&str; 18] = [
+    "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "0011",
+    "1100", "1101", "1110", "1111", "dummy", "dummy",
 ];
 
-pub const TIME_MARK: [&str; 16] = [
+pub const TIME_MARK: [&str; 18] = [
     "minecraft:white_carpet",
     "minecraft:orange_carpet",
     "minecraft:magenta_carpet",
@@ -59,6 +64,8 @@ pub const TIME_MARK: [&str; 16] = [
     "minecraft:green_carpet",
     "minecraft:red_carpet",
     "minecraft:black_carpet",
+    "minecraft:birch_fence",
+    "minecraft:spruce_fence",
 ];
 
 pub const DUMMY: [&str; 2] = ["minecraft:birch_fence", "minecraft:spruce_fence"];

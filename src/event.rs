@@ -37,40 +37,43 @@ impl PianoGlobal {
 
     pub fn click_edit(&mut self, ic: u8, time: usize) {
         //log(format!("{}--{}", ic, time).as_str());
-        let i = &self.insts[ic as usize];
-        self.play(i.0, i.1);
+        if let Some(i) = &self.insts.get(ic as usize) {
+            self.play(i.0, i.1);
 
-        if let Some(t) = self.tracks.iter_mut().find(|t| {
-            if let Some(n) = t.notes.get(time >> 2) {
-                //log(format!("{}--{}--{}",n.insi,n.note).as_str());
-                (n.inst, n.note) == *i
+            if let Some(t) = self.tracks.iter_mut().find(|t| {
+                if let Some(n) = t.notes.get(time >> 2) {
+                    //log(format!("{}--{}--{}",n.insi,n.note).as_str());
+                    (n.inst, n.note) == **i
+                } else {
+                    false
+                }
+            }) {
+                //log("-------------------------get A");
+                if let Some(n) = &mut t.notes.get_mut(time >> 2) {
+                    n.beat ^= 0b1000 >> (time & 0b11);
+                }
+            } else if let Some(t) = self.tracks.iter_mut().find(|t| {
+                if let Some(n) = t.notes.get(time >> 2) {
+                    n.beat == 0
+                } else {
+                    false
+                }
+            }) {
+                //log("-------------------------get B");
+                if let Some(n) = t.notes.get_mut(time >> 2) {
+                    n.insi = ic;
+                    n.inst = i.0;
+                    n.note = i.1;
+                    n.beat ^= 0b1000 >> (time & 0b11);
+                }
             } else {
-                false
+                //log(format!("{:?}", i).as_str());
+                //log("notfound");
             }
-        }) {
-            //log("-------------------------get A");
-            let n = &mut t.notes[time >> 2];
-            n.beat ^= 0b1000 >> (time & 0b11);
-        } else if let Some(t) = self.tracks.iter_mut().find(|t| {
-            if let Some(n) = t.notes.get(time >> 2) {
-                n.beat == 0
-            } else {
-                false
-            }
-        }) {
-            //log("-------------------------get B");
-            let n = &mut t.notes[time >> 2];
-            n.insi = ic;
-            n.inst = i.0;
-            n.note = i.1;
-            n.beat ^= 0b1000 >> (time & 0b11);
-        } else {
-            //log(format!("{:?}", i).as_str());
-            //log("notfound");
+
+            self.flesh_insts();
+            self.draw_all();
         }
-
-        self.flesh_insts();
-        self.draw_all();
     }
 
     pub fn click_play(&mut self, ic: u8) {
