@@ -28,6 +28,7 @@ extern "C" {
     fn log(s: &str);
 }
 
+#[allow(unused_unsafe)]
 pub fn l(s: String) {
     unsafe {
         log(s.as_str());
@@ -43,6 +44,8 @@ pub struct PianoGlobal {
 
     config: PianoConfig,
     rtd: RuntimeData,
+
+    theme: Theme,
 }
 
 #[wasm_bindgen]
@@ -56,6 +59,7 @@ impl PianoGlobal {
 
         let config = PianoConfig::new();
 
+        let theme = Theme::new();
         let mut p = PianoGlobal {
             actx,
             cctx,
@@ -64,6 +68,7 @@ impl PianoGlobal {
 
             config,
             rtd: RuntimeData::new(),
+            theme,
         };
 
         p.resize(20);

@@ -1,5 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
+use wasm_bindgen::JsValue;
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
 pub struct Note {
     pub inst: u8,
@@ -11,7 +13,12 @@ pub struct Note {
 pub struct Track {
     pub inst: usize,
     pub hide: bool,
-    pub colo: String,
+
+    #[serde(skip_deserializing, skip_serializing)]
+    pub colo: JsValue,
+
+    pub colo_s: String,
+
     pub notes: Vec<Note>,
 }
 
@@ -20,12 +27,14 @@ impl Track {
         let notes = vec![Default::default()];
         let inst = 0;
         let hide = false;
-        let colo = String::from("#9a9dea");
+        let colo = JsValue::from_str("#9a9dea");
+        let colo_s = String::from("#9a9dea");
         Track {
             inst,
             hide,
             notes,
             colo,
+            colo_s,
         }
     }
     pub fn deleteable(&self) -> bool {

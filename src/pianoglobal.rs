@@ -38,6 +38,42 @@ pub struct RuntimeData {
     pub tablh: f64,
 }
 
+pub struct Theme {
+    pub control: [JsValue; 6],
+    pub track_row: Vec<JsValue>,
+    pub note_row: Vec<JsValue>,
+}
+
+impl Theme {
+    pub fn new() -> Theme {
+        Theme {
+            control: [
+                "green".into(),
+                "blue".into(),
+                "red".into(),
+                "oraange".into(),
+                "yellow".into(),
+                "red".into(),
+            ],
+            track_row: vec!["#22443322".into(), "#44223333".into()],
+            note_row: vec![
+                "#aaaaaa".into(),
+                "#ffffff".into(),
+                "#aaaaaa".into(),
+                "#ffffff".into(),
+                "#aaaaaa".into(),
+                "#ffffff".into(),
+                "#ffffff".into(),
+                "#aaaaaa".into(),
+                "#ffffff".into(),
+                "#aaaaaa".into(),
+                "#ffffff".into(),
+                "#ffffff".into(),
+            ],
+        }
+    }
+}
+
 impl RuntimeData {
     pub fn new() -> RuntimeData {
         RuntimeData {

@@ -15,8 +15,8 @@ impl PianoGlobal {
             .clear_rect(0f64, 0f64, self.rtd.tablw, self.rtd.tablh);
 
         //self.flesh_insts();
-        self.draw_backline();
         self.draw_insts();
+        self.draw_backline();
         self.draw_tracks();
     }
 }
@@ -53,146 +53,125 @@ impl PianoGlobal {
     }
 
     pub fn draw_insts(&self) {
-        let row_styles = [&"#22443322".into(), &"#44223333".into()];
+        //let row_styles = [&"#22443322".into(), &"#44223333".into()];
         let c = &self.cctx;
-        let mut yoffset = self.tracks.len() as f64 * self.rtd.cellh + self.rtd.borde;
-        (0..25).into_iter().rev().for_each(|i| {
+        //let mut yoffset = self.tracks.len() as f64 * self.rtd.cellh + self.rtd.borde;
+        let theme = &self.theme;
+        let rt = &self.rtd;
+
+        // draw control-pane and secquene-paneb background
+        (0..self.tracks.len()).into_iter().for_each(|ti| {
+            c.set_fill_style(&theme.track_row[ti % theme.track_row.len()]);
+            c.fill_rect(0f64, rt.cellh * ti as f64, rt.tablw, rt.cellh);
+        });
+
+        // draw edit-pane background
+        (0..25).into_iter().for_each(|i| {
+            let y = (self.tracks.len() + i) as f64 * rt.cellh;
+
+            c.set_fill_style(&theme.note_row[i % theme.note_row.len()]);
+            c.fill_rect(0f64, y, rt.tablw, rt.cellh);
+
             c.set_fill_style(&"black".into());
-            c.fill_text(TITLE[i], 10f64, yoffset + self.rtd.cellh * 0.6f64)
+            c.fill_text(TITLE[24 - i], 10f64, y + rt.cellh * 0.6f64)
                 .unwrap_throw();
-            c.set_fill_style(row_styles[i % 2]);
-            c.fill_rect(
-                self.rtd.borde,
-                yoffset,
-                self.rtd.tablw - self.rtd.borde * 2f64,
-                self.rtd.cellh - self.rtd.borde * 2f64,
-            );
-            yoffset += self.rtd.cellh;
         })
-        //self.insts.iter().enumerate().for_each(|(i, inst)| {
-        //    c.set_fill_style(&"black".into());
-        //    c.fill_text(TITLE[*inst], 10f64, yoffset + CELLH * 0.6f64)
-        //        .unwrap_throw();
-        //    c.set_fill_style(row_styles[i % 2]);
-        //    c.fill_rect(BORDE, yoffset, TABLW - BORDE * 2f64, CELLH - BORDE * 2f64);
-        //    yoffset += CELLH;
-        //})
     }
 
     pub fn draw_backline(&self) {
         let c = &self.cctx;
-        let line = [&"#444444FF".into(), &"#00000044".into()];
+        let line = [&"#666666".into(), &"#cccccc".into()];
 
-        let mut x = self.rtd.titlw;
-        let mut i = 0;
+        c.begin_path();
 
-        while x < self.rtd.tablw {
-            c.begin_path();
-            c.set_stroke_style(line[if i % 4 == 0 { 0 } else { 1 }]);
-
+        // draw lighter line
+        c.set_stroke_style(line[1]);
+        (0..self.rtd.maxnote).into_iter().for_each(|i| {
+            let x = self.rtd.titlw + i as f64 * self.rtd.notew;
             c.move_to(x, 0f64);
             c.line_to(x, self.rtd.tablh);
-            x += self.rtd.notew;
+        });
 
-            c.stroke();
-            i += 1;
-        }
+        // draw darker line
+        c.set_stroke_style(line[0]);
+        (0..self.rtd.maxnote / 4).into_iter().for_each(|i| {
+            let x = self.rtd.titlw + i as f64 * self.rtd.cellw;
+            c.move_to(x, 0f64);
+            c.line_to(x, self.rtd.tablh);
+        });
+
+        c.stroke();
     }
 
     pub fn draw_track(&self, t: &Track, ti: usize) {
-        let yoffset = self.rtd.borde + ti as f64 * self.rtd.cellh;
-        let row_styles = [&"#22443322".into(), &"#44223333".into()];
-        let c = &self.cctx;
-        if t.hide {
-            c.set_fill_style(&"green".into());
-        } else {
-            c.set_fill_style(&"blue".into());
-        };
-        c.fill_rect(
-            self.rtd.borde,
-            yoffset,
-            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
-            self.rtd.cellh - self.rtd.borde * 2f64,
-        );
+        let theme = &self.theme;
 
-        c.set_fill_style(&"red".into());
-        c.fill_rect(
-            self.rtd.borde + self.rtd.titlw / 4f64,
-            yoffset,
-            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
-            self.rtd.cellh - self.rtd.borde * 2f64,
-        );
+        // draw control part
+        let area = Area::TrackControl;
+        let is_selected = self.rtd.sel_track == ti;
 
-        if self.rtd.sel_track == ti {
-            c.set_fill_style(&"orange".into());
-        } else {
-            c.set_fill_style(&"yellow".into());
-        }
+        self.draw_cube(&theme.control[t.hide as usize], &area, 0, ti);
+        self.draw_cube(&theme.control[2], &area, 1, ti);
+        self.draw_cube(&theme.control[3 + is_selected as usize], &area, 2, ti);
+        self.draw_cube(&t.colo, &area, 3, ti);
 
-        c.fill_rect(
-            self.rtd.borde + self.rtd.titlw / 2f64,
-            yoffset,
-            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
-            self.rtd.cellh - self.rtd.borde * 2f64,
-        );
-
-        c.set_fill_style(&t.colo.as_str().into());
-        c.fill_rect(
-            self.rtd.borde + self.rtd.titlw * 0.75f64,
-            yoffset,
-            self.rtd.titlw / 4f64 - self.rtd.borde * 2f64,
-            self.rtd.cellh - self.rtd.borde * 2f64,
-        );
-
-        let mut xoffset = self.rtd.titlw + self.rtd.borde;
-        // bg color
-        c.set_fill_style(row_styles[ti % 2]);
-        c.fill_rect(
-            xoffset,
-            yoffset,
-            self.rtd.tablw - self.rtd.borde * 2f64,
-            self.rtd.cellh - self.rtd.borde * 2f64,
-        );
-
-        t.notes.iter().enumerate().for_each(|(_, n)| {
+        t.notes.iter().enumerate().for_each(|(ni, n)| {
+            let area = Area::TrackSecquence;
             if n.beat == 0 {
-                xoffset += self.rtd.cellw;
                 return;
             }
 
-            // draw cell
-            //c.set_fill_style(ins_styles[2]);
-            c.set_fill_style(&"#e53e0f".into());
-            c.fill_rect(
-                xoffset,
-                yoffset + self.rtd.cellh - 3f64,
-                self.rtd.cellw - self.rtd.borde * 2f64,
-                4f64,
-            );
+            // draw under line for every note that is not empty.
+            self.draw_down_line(ni, ti);
 
-            // draw note
-            [0, 1, 2, 3].iter().fold(0b1000, |mask, _| {
-                if mask & n.beat != 0 {
-                    //c.set_fill_style(col_styles[(j + 1) % 2]);
-                    c.set_fill_style(&t.colo.as_str().into());
-                    c.fill_rect(
-                        xoffset,
-                        yoffset,
-                        self.rtd.notew - self.rtd.borde * 2f64,
-                        self.rtd.notew - self.rtd.borde * 2f64,
-                    );
+            (0..4).into_iter().for_each(|bi| {
+                if 0b1000 >> bi & n.beat != 0 {
+                    self.draw_cube(&t.colo, &area, ni * 4 + bi as usize, ti);
                     if !t.hide {
-                        c.fill_rect(
-                            xoffset,
-                            (self.tracks.len() + (24 - n.note as usize)) as f64 * self.rtd.cellh,
-                            self.rtd.notew - self.rtd.borde * 2f64,
-                            self.rtd.notew - self.rtd.borde * 2f64,
+                        self.draw_cube(
+                            &t.colo,
+                            &Area::EditPlane,
+                            ni * 4 + bi,
+                            24 - n.note as usize,
                         );
                     }
                 }
-                xoffset += self.rtd.notew;
-                mask >> 1
             });
         });
     }
+
+    pub fn draw_cube(&self, color: &JsValue, area: &Area, x: usize, y: usize) {
+        // use different offset for different areas.
+        let (xoffset, yoffset) = match area {
+            Area::TrackControl => (0f64, 0f64),
+            Area::TrackSecquence => (self.rtd.titlw, 0f64),
+            Area::EditPlane => (self.rtd.titlw, self.tracks.len() as f64 * self.rtd.cellh),
+        };
+        let cv = &self.rtd;
+
+        self.cctx.set_fill_style(color);
+        self.cctx.fill_rect(
+            x as f64 * cv.notew + xoffset + cv.borde,
+            y as f64 * cv.cellh + yoffset + cv.borde,
+            self.rtd.notew - cv.borde * 2f64,
+            self.rtd.cellh - cv.borde * 4f64,
+        );
+    }
+
+    pub fn draw_down_line(&self, x: usize, y: usize) {
+        let cv = &self.rtd;
+        self.cctx.set_fill_style(&self.theme.control[5]);
+        self.cctx.fill_rect(
+            x as f64 * cv.cellw + cv.titlw + cv.borde,
+            y as f64 * cv.cellh + 0.75f64 * cv.cellh,
+            cv.cellw - cv.borde * 2f64,
+            cv.cellh * 0.25,
+        );
+    }
+}
+
+pub enum Area {
+    TrackControl,
+    TrackSecquence,
+    EditPlane,
 }

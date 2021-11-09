@@ -24,14 +24,15 @@ impl PianoGlobal {
         };
     }
 
-    pub fn add_track(&mut self, inst: i32, colo: String) {
+    pub fn add_track(&mut self, inst: i32, colo_s: String) {
         if inst < 0 {
             return;
         }
         self.tracks.push(Track {
             inst: inst as usize,
             hide: false,
-            colo,
+            colo: JsValue::from(colo_s.as_str()),
+            colo_s,
             notes: Default::default(),
         });
         self.resize(0);
