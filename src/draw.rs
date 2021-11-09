@@ -184,7 +184,7 @@ impl PianoGlobal {
                     if !t.hide {
                         c.fill_rect(
                             xoffset,
-                            (self.tracks.len() + n.note as usize) as f64 * self.rtd.cellh,
+                            (self.tracks.len() + (24 - n.note as usize)) as f64 * self.rtd.cellh,
                             self.rtd.notew - self.rtd.borde * 2f64,
                             self.rtd.notew - self.rtd.borde * 2f64,
                         );

@@ -79,9 +79,9 @@ impl PianoGlobal {
 
             if let Some(Some(n)) = self.tracks.get_mut(sel_track).map(|t| t.get_mut(inote)) {
                 if n.beat == 0 {
-                    n.note = ic;
+                    n.note = 24 - ic;
                 }
-                if n.note == ic {
+                if n.note == 24 - ic {
                     if on {
                         //crate::l(format!("--------------------------{}-{}-{}", n.beat, beat,n & ));
                         if (n.beat & beat) == 0 {
