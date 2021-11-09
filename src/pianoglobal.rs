@@ -19,7 +19,7 @@ pub struct NoteBox {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct PianoConfig {
     pub tracks: Vec<Track>,
-    pub insts: Vec<usize>,
+    //pub insts: Vec<usize>,
 }
 
 #[derive(Debug)]
@@ -59,9 +59,9 @@ impl RuntimeData {
 impl PianoConfig {
     pub fn new() -> PianoConfig {
         let tracks = vec![Track::new()];
-        let insts = vec![11];
+        //let insts = vec![11];
 
-        PianoConfig { tracks, insts }
+        PianoConfig { tracks }
     }
 }
 

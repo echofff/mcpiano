@@ -66,7 +66,7 @@ impl PianoGlobal {
             rtd: RuntimeData::new(),
         };
 
-        p.resize(40);
+        p.resize(20);
         p
     }
 }

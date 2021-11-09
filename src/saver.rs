@@ -24,6 +24,18 @@ impl PianoGlobal {
         };
     }
 
+    pub fn add_track(&mut self, inst: i32) {
+        if inst < 0 {
+            return;
+        }
+        self.tracks.push(Track {
+            inst: inst as usize,
+            hide: false,
+            notes: Default::default(),
+        });
+        self.resize(0);
+    }
+
     pub fn resize(&mut self, n: i32) {
         if n < 0 {
             return;
