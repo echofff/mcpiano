@@ -1,9 +1,9 @@
 use crate::PianoGlobal;
-use std::borrow::BorrowMut;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
+use web_sys::HtmlCanvasElement;
 
 use crate::map::*;
 
@@ -12,12 +12,16 @@ impl PianoGlobal {
     pub fn draw_all(&mut self) {
         self.cctx.clear_rect(0f64, 0f64, TABLW, TABLH);
 
-        self.flesh_insts();
+        //self.flesh_insts();
         self.draw_backline();
         self.draw_insts();
         self.draw_tracks();
     }
-    pub fn scanvas() -> CanvasRenderingContext2d {
+}
+
+impl PianoGlobal {
+
+    pub fn scanvas() -> (HtmlCanvasElement, CanvasRenderingContext2d) {
         let document = web_sys::window().unwrap().document().unwrap();
         let canvas = document.get_element_by_id("canvas").unwrap();
         let canvas: web_sys::HtmlCanvasElement = canvas
@@ -32,7 +36,7 @@ impl PianoGlobal {
             .dyn_into::<web_sys::CanvasRenderingContext2d>()
             .unwrap();
 
-        context
+        (canvas, context)
 
         //context.fill_rect(20f64, 20f64, 50f64, 50f64);
         //let a = JsString::from("green");
@@ -41,29 +45,29 @@ impl PianoGlobal {
         //context.fill_rect(50f64, 50f64, 330f64, 330f64);
     }
 
-    pub fn flesh_insts(&mut self) {
-        self.tracks.iter_mut().for_each(|t| {
-            t.notes.iter_mut().for_each(|n| {
-                if let Some(i) = self.insts.get(n.insi as usize) {
-                    if *i == (n.inst, n.note) {
-                        return;
-                    }
-                }
+    //pub fn flesh_insts(&mut self) {
+    //    self.tracks.iter_mut().for_each(|t| {
+    //        t.notes.iter_mut().for_each(|n| {
+    //            if let Some(i) = self.insts.get(n.insi as usize) {
+    //                if *i == (n.inst, n.note) {
+    //                    return;
+    //                }
+    //            }
 
-                if let Some((insi, _)) = self
-                    .insts
-                    .iter()
-                    .enumerate()
-                    .find(|e| *e.1 == (n.inst, n.note))
-                {
-                    //log("find");
-                    n.borrow_mut().insi = insi as u8;
-                }
+    //            if let Some((insi, _)) = self
+    //                .insts
+    //                .iter()
+    //                .enumerate()
+    //                .find(|e| *e.1 == (n.inst, n.note))
+    //            {
+    //                //log("find");
+    //                n.borrow_mut().insi = insi as u8;
+    //            }
 
-                //n.borrow_mut().
-            })
-        })
-    }
+    //            //n.borrow_mut().
+    //        })
+    //    })
+    //}
 
     pub fn draw_tracks(&self) {
         let c = &self.cctx;
@@ -104,7 +108,7 @@ impl PianoGlobal {
                         c.fill_rect(xoffset, yoffset, NOTEW - BORDE * 2f64, NOTEW - BORDE * 2f64);
                         c.fill_rect(
                             xoffset,
-                            (self.tracks.len() + n.insi as usize) as f64 * CELLH,
+                            (self.tracks.len() + n.note as usize) as f64 * CELLH,
                             NOTEW - BORDE * 2f64,
                             NOTEW - BORDE * 2f64,
                         );
@@ -121,14 +125,22 @@ impl PianoGlobal {
         let row_styles = [&"#22443322".into(), &"#44223333".into()];
         let c = &self.cctx;
         let mut yoffset = self.tracks.len() as f64 * CELLH + BORDE;
-        self.insts.iter().enumerate().for_each(|(i, inst)| {
+        (0..25).into_iter().rev().for_each(|i| {
             c.set_fill_style(&"black".into());
-            c.fill_text(TITLE[inst.1 as usize], 10f64, yoffset + CELLH * 0.6f64)
+            c.fill_text(TITLE[i], 10f64, yoffset + CELLH * 0.6f64)
                 .unwrap_throw();
             c.set_fill_style(row_styles[i % 2]);
             c.fill_rect(BORDE, yoffset, TABLW - BORDE * 2f64, CELLH - BORDE * 2f64);
             yoffset += CELLH;
         })
+        //self.insts.iter().enumerate().for_each(|(i, inst)| {
+        //    c.set_fill_style(&"black".into());
+        //    c.fill_text(TITLE[*inst], 10f64, yoffset + CELLH * 0.6f64)
+        //        .unwrap_throw();
+        //    c.set_fill_style(row_styles[i % 2]);
+        //    c.fill_rect(BORDE, yoffset, TABLW - BORDE * 2f64, CELLH - BORDE * 2f64);
+        //    yoffset += CELLH;
+        //})
     }
 
     pub fn draw_backline(&self) {

@@ -4,15 +4,20 @@ mod draw;
 mod event;
 mod export;
 mod map;
+mod pianoglobal;
 mod play;
-mod saver;
+mod track;
+use pianoglobal::*;
+
+use track::*;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::throw_str;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::CanvasRenderingContext2d;
-use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
+use web_sys::HtmlCanvasElement;
+use web_sys::{AudioContext, Request, RequestInit, Response};
 
 #[wasm_bindgen]
 extern "C" {
@@ -23,51 +28,41 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-#[derive(serde::Deserialize)]
-struct NoteBox {
-    name: String,
-    hash: String,
-    //size: usize,
-
-    #[serde(skip_deserializing)]
-    audio: Option<AudioBuffer>,
-}
-
-#[wasm_bindgen]
-#[derive(Debug)]
-pub struct Track {
-    notes: Vec<Note>,
-}
-
-#[wasm_bindgen]
-#[derive(Debug, Clone)]
-struct Note {
-    insi: u8,
-    inst: u8,
-    note: u8,
-    beat: u8,
-}
-
-#[wasm_bindgen]
 pub struct PianoGlobal {
     actx: AudioContext,
     cctx: CanvasRenderingContext2d,
-    notes: Vec<NoteBox>,
-    tracks: Vec<Track>,
-    insts: Vec<(u8, u8)>,
+    _canv: HtmlCanvasElement,
+    sounds: Vec<NoteBox>,
 
-    maxnote: usize,
-    pause: bool,
+    config: PianoConfig,
+    rtd: RuntimeData,
 }
 
 #[wasm_bindgen]
 impl PianoGlobal {
-    #[wasm_bindgen]
     pub async fn new() -> PianoGlobal {
         let actx = AudioContext::new().unwrap_throw();
         //let mut notes: Vec<NoteBox> = conf.into_serde().unwrap_throw();
-        let pause = false;
+        let sounds = Self::create_soundbox(&actx).await;
 
+        let (_canv, cctx) = Self::scanvas();
+
+        let config = PianoConfig::new();
+
+        PianoGlobal {
+            actx,
+            cctx,
+            _canv,
+            sounds,
+
+            config,
+            rtd: Default::default(),
+        }
+    }
+}
+
+impl PianoGlobal {
+    pub async fn create_soundbox(actx: &AudioContext) -> Vec<NoteBox> {
         let mut opts = RequestInit::new();
         opts.method("GET");
 
@@ -94,105 +89,15 @@ impl PianoGlobal {
         };
 
         // Use serde to parse the JSON into a struct.
-        let mut notes: Vec<NoteBox> = json.into_serde().unwrap();
+        let mut sounds: Vec<NoteBox> = json.into_serde().unwrap();
 
-        for ele in &mut notes {
+        for ele in &mut sounds {
             //ele.genab(&ctx).await.expect_throw("run-> for");
             let a = ele.genab(&actx).await;
             if let Err(a) = a {
                 throw_str(format!("---------{:?}", a).as_str());
             }
         }
-
-        let mut insts = Vec::new();
-
-        (0..25).for_each(|i| insts.push((11, 24 - i)));
-
-        let cctx = Self::scanvas();
-
-        let tracks = vec![
-            Track {
-                notes: vec![
-                    Note {
-                        insi: 0,
-                        inst: 11,
-                        note: 10,
-                        beat: 0
-                    };
-                    23
-                ],
-            },
-            Track {
-                notes: vec![
-                    Note {
-                        insi: 0,
-                        inst: 11,
-                        note: 11,
-                        beat: 0
-                    };
-                    23
-                ],
-            },
-            Track {
-                notes: vec![
-                    Note {
-                        insi: 0,
-                        inst: 11,
-                        note: 12,
-                        beat: 0
-                    };
-                    23
-                ],
-            },
-            Track {
-                notes: vec![
-                    Note {
-                        insi: 0,
-                        inst: 11,
-                        note: 13,
-                        beat: 0
-                    };
-                    23
-                ],
-            },
-        ];
-
-        PianoGlobal {
-            actx,
-            cctx,
-            notes,
-            tracks,
-            insts,
-
-            maxnote: 24 * 4 * 4,
-
-            pause,
-        }
-    }
-
-}
-
-#[wasm_bindgen]
-impl NoteBox {
-    async fn genab(&mut self, ctx: &AudioContext) -> Result<(), JsValue> {
-        let mut opts = RequestInit::new();
-        opts.method("GET");
-        let urls = format!("./res/{}", self.hash);
-
-        let req = Request::new_with_str_and_init(&urls, &opts)?;
-        let window = web_sys::window().unwrap();
-
-        let resp: Response = JsFuture::from(window.fetch_with_request(&req))
-            .await?
-            .dyn_into()?;
-        let ab = JsFuture::from(resp.array_buffer()?).await?.dyn_into()?;
-
-        let ab = JsFuture::from(ctx.decode_audio_data(&ab)?)
-            .await?
-            .dyn_into()?;
-
-        self.audio = Some(ab);
-
-        Ok(())
+        sounds
     }
 }

@@ -5,10 +5,6 @@ use crate::Track;
 
 use wasm_bindgen::prelude::*;
 
-//const SHULKSTART: [String; 1] = [String::from(
-//    "\"id\":\"minecraft:shulker_box\",\"tag\":{\"BlockEntityTag\":{\"Items\":[",
-//)];
-//const SHULKEND: [String; 1] = [String::from("]}")];
 
 #[wasm_bindgen]
 impl PianoGlobal {
@@ -54,12 +50,8 @@ impl PianoGlobal {
                 start.chain(b).chain(end)
             });
 
-        //.collect::<Vec<_>>();
-
-        //let b: i32 = shulkstart.chain(shulkbody);
 
        shulkstart.chain(shulkbody).chain(shulkend).collect::<Vec<_>>().join("")
-        //res = format!("{:?}\n{:?} ", n, b);
     }
 
     pub fn track_pre(t: &Track) -> (Vec<Vec<(u8, usize)>>, Vec<Vec<(u8, usize)>>) {
@@ -95,7 +87,7 @@ impl PianoGlobal {
 
             if next.1 == cur_beat.0 {
                 cur_beat.1 += 1;
-                crate::log(&"beat add");
+                //crate::log(&"beat add");
             } else {
                 if beats.len() == 27 {
                     shulk_beat.push(beats);
