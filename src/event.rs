@@ -45,7 +45,7 @@ impl PianoGlobal {
                     1 => {
                         if let Some(true) = self.tracks.get(i as usize).map(|t| t.deleteable()) {
                             self.tracks.remove(i as usize);
-                            self.draw_all();
+                            self.resize(0)
                         }
                     }
                     _ => {

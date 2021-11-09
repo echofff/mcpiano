@@ -41,8 +41,6 @@ impl PianoGlobal {
     }
 
     pub fn draw_tracks(&self) {
-        let c = &self.cctx;
-
         self.tracks.iter().enumerate().for_each(|(i, t)| {
             if i != self.rtd.sel_track {
                 self.draw_track(t, i);
