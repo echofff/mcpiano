@@ -6,6 +6,7 @@ mod export;
 mod map;
 mod pianoglobal;
 mod play;
+mod saver;
 mod track;
 use pianoglobal::*;
 
@@ -25,6 +26,12 @@ extern "C" {
 
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+}
+
+pub fn l(s: String) {
+    unsafe {
+        log(s.as_str());
+    }
 }
 
 #[wasm_bindgen]
