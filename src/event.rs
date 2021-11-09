@@ -2,8 +2,6 @@ use crate::PianoGlobal;
 
 use wasm_bindgen::prelude::*;
 
-use crate::map::*;
-
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn click(
@@ -16,26 +14,26 @@ impl PianoGlobal {
         _ctrl: bool,
         _alt: bool,
     ) {
-        let ylimit: i32 = self.tracks.len() as i32 * CELLH as i32;
-        let xlimit: i32 = TITLW as i32;
+        let ylimit: i32 = self.tracks.len() as i32 * self.rtd.cellh as i32;
+        let xlimit: i32 = self.rtd.titlw as i32;
         //log(format!("{}--{}--{}--{}--{}",xlimit,ylimit,x,y,left).as_str());
         //crate::l(format!("{}{}", left, down));
         match (down, (x > xlimit), (y > ylimit), left) {
             (true, true, true, 1) => self.click_edit(
-                ((y - ylimit) / CELLH as i32) as u8,
-                (x - xlimit) as usize / NOTEW as usize,
+                ((y - ylimit) / self.rtd.cellh as i32) as u8,
+                (x - xlimit) as usize / self.rtd.notew as usize,
                 true,
             ),
             (true, true, true, 2) => self.click_edit(
-                ((y - ylimit) / CELLH as i32) as u8,
-                (x - xlimit) as usize / NOTEW as usize,
+                ((y - ylimit) / self.rtd.cellh as i32) as u8,
+                (x - xlimit) as usize / self.rtd.notew as usize,
                 false,
             ),
             (true, true, false, 1) => self.click_del(
-                (y / CELLH as i32) as u8,
-                (x - xlimit) as usize / NOTEW as usize,
+                (y / self.rtd.cellh as i32) as u8,
+                (x - xlimit) as usize / self.rtd.notew as usize,
             ),
-            (true, false, true, 1) => self.click_play(((y - ylimit) / CELLH as i32) as u8),
+            (true, false, true, 1) => self.click_play(((y - ylimit) / self.rtd.cellh as i32) as u8),
             (true, false, false, ..) => {}
             _ => {}
         }

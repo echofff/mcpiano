@@ -10,7 +10,8 @@ use crate::map::*;
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn draw_all(&mut self) {
-        self.cctx.clear_rect(0f64, 0f64, TABLW, TABLH);
+        self.cctx
+            .clear_rect(0f64, 0f64, self.rtd.tablw, self.rtd.tablh);
 
         //self.flesh_insts();
         self.draw_backline();
@@ -20,7 +21,6 @@ impl PianoGlobal {
 }
 
 impl PianoGlobal {
-
     pub fn scanvas() -> (HtmlCanvasElement, CanvasRenderingContext2d) {
         let document = web_sys::window().unwrap().document().unwrap();
         let canvas = document.get_element_by_id("canvas").unwrap();
@@ -83,55 +83,75 @@ impl PianoGlobal {
             &"#645122".into(),
         ];
 
-        let mut yoffset = 0f64 + BORDE;
+        let mut yoffset = 0f64 + self.rtd.borde;
         self.tracks.iter().enumerate().for_each(|(i, t)| {
-            let mut xoffset = TITLW + BORDE;
+            let mut xoffset = self.rtd.titlw + self.rtd.borde;
             // bg color
             c.set_fill_style(row_styles[i % 2]);
-            c.fill_rect(xoffset, yoffset, TABLW - BORDE * 2f64, CELLH - BORDE * 2f64);
+            c.fill_rect(
+                xoffset,
+                yoffset,
+                self.rtd.tablw - self.rtd.borde * 2f64,
+                self.rtd.cellh - self.rtd.borde * 2f64,
+            );
 
-            t.notes.iter().enumerate().for_each(|(j, n)| {
+            t.notes.iter().enumerate().for_each(|(_, n)| {
                 if n.beat == 0 {
-                    xoffset += CELLW;
+                    xoffset += self.rtd.cellw;
                     return;
                 }
 
                 // draw cell
                 c.set_fill_style(ins_styles[2]);
-                c.fill_rect(xoffset, yoffset + CELLH - 3f64, CELLW - BORDE * 2f64, 4f64);
+                c.fill_rect(
+                    xoffset,
+                    yoffset + self.rtd.cellh - 3f64,
+                    self.rtd.cellw - self.rtd.borde * 2f64,
+                    4f64,
+                );
 
                 // draw note
                 [0, 1, 2, 3].iter().fold(0b1000, |mask, _| {
                     if mask & n.beat != 0 {
                         //c.set_fill_style(col_styles[(j + 1) % 2]);
                         c.set_fill_style(ins_styles[i]);
-                        c.fill_rect(xoffset, yoffset, NOTEW - BORDE * 2f64, NOTEW - BORDE * 2f64);
                         c.fill_rect(
                             xoffset,
-                            (self.tracks.len() + n.note as usize) as f64 * CELLH,
-                            NOTEW - BORDE * 2f64,
-                            NOTEW - BORDE * 2f64,
+                            yoffset,
+                            self.rtd.notew - self.rtd.borde * 2f64,
+                            self.rtd.notew - self.rtd.borde * 2f64,
+                        );
+                        c.fill_rect(
+                            xoffset,
+                            (self.tracks.len() + n.note as usize) as f64 * self.rtd.cellh,
+                            self.rtd.notew - self.rtd.borde * 2f64,
+                            self.rtd.notew - self.rtd.borde * 2f64,
                         );
                     }
-                    xoffset += NOTEW;
+                    xoffset += self.rtd.notew;
                     mask >> 1
                 });
             });
-            yoffset += CELLH;
+            yoffset += self.rtd.cellh;
         })
     }
 
     pub fn draw_insts(&self) {
         let row_styles = [&"#22443322".into(), &"#44223333".into()];
         let c = &self.cctx;
-        let mut yoffset = self.tracks.len() as f64 * CELLH + BORDE;
+        let mut yoffset = self.tracks.len() as f64 * self.rtd.cellh + self.rtd.borde;
         (0..25).into_iter().rev().for_each(|i| {
             c.set_fill_style(&"black".into());
-            c.fill_text(TITLE[i], 10f64, yoffset + CELLH * 0.6f64)
+            c.fill_text(TITLE[i], 10f64, yoffset + self.rtd.cellh * 0.6f64)
                 .unwrap_throw();
             c.set_fill_style(row_styles[i % 2]);
-            c.fill_rect(BORDE, yoffset, TABLW - BORDE * 2f64, CELLH - BORDE * 2f64);
-            yoffset += CELLH;
+            c.fill_rect(
+                self.rtd.borde,
+                yoffset,
+                self.rtd.tablw - self.rtd.borde * 2f64,
+                self.rtd.cellh - self.rtd.borde * 2f64,
+            );
+            yoffset += self.rtd.cellh;
         })
         //self.insts.iter().enumerate().for_each(|(i, inst)| {
         //    c.set_fill_style(&"black".into());
@@ -147,16 +167,16 @@ impl PianoGlobal {
         let c = &self.cctx;
         let line = [&"#444444FF".into(), &"#00000044".into()];
 
-        let mut x = TITLW;
+        let mut x = self.rtd.titlw;
         let mut i = 0;
 
-        while x < TABLW {
+        while x < self.rtd.tablw {
             c.begin_path();
             c.set_stroke_style(line[if i % 4 == 0 { 0 } else { 1 }]);
 
             c.move_to(x, 0f64);
-            c.line_to(x, TABLH);
-            x += NOTEW;
+            c.line_to(x, self.rtd.tablh);
+            x += self.rtd.notew;
 
             c.stroke();
             i += 1;

@@ -1,21 +1,19 @@
-
 use crate::map::*;
 use crate::PianoGlobal;
 use crate::Track;
 
 use wasm_bindgen::prelude::*;
 
-
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn export(&self) -> String {
         let mut res = String::new();
 
-        self.tracks.iter().enumerate().for_each(|(i,t)|{
-            let (n,b) = Self::track_pre(t);
+        self.tracks.iter().enumerate().for_each(|(i, t)| {
+            let (n, b) = Self::track_pre(t);
 
-            res.push_str( Self::shulk_i(&n, i, true).as_str());
-            res.push_str( Self::shulk_i(&b, i, false).as_str());
+            res.push_str(Self::shulk_i(&n, i, true).as_str());
+            res.push_str(Self::shulk_i(&b, i, false).as_str());
         });
         res
     }
@@ -38,7 +36,7 @@ impl PianoGlobal {
                         ( TIME_MARK[n.0 as usize], TIME_MARK_NAME[n.0 as usize])
                     };
                     format!( "{{\"id\":\"{}\",\"tag\":{{\"display\":{{\"Name\":\"{{\\\"text\\\": \\\"{}\\\"}}\"}}}},\"Slot\":{},\"Count\":{}}},", obj,name, i, n.1)
-                }); 
+                }) ;
 
                 let start = vec![String::from(
                     "{\"id\":\"minecraft:shulker_box\",\"tag\":{\"BlockEntityTag\":{\"Items\":[",
@@ -50,8 +48,11 @@ impl PianoGlobal {
                 start.chain(b).chain(end)
             });
 
-
-       shulkstart.chain(shulkbody).chain(shulkend).collect::<Vec<_>>().join("")
+        shulkstart
+            .chain(shulkbody)
+            .chain(shulkend)
+            .collect::<Vec<_>>()
+            .join("")
     }
 
     pub fn track_pre(t: &Track) -> (Vec<Vec<(u8, usize)>>, Vec<Vec<(u8, usize)>>) {

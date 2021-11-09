@@ -3,8 +3,6 @@ use std::ops::DerefMut;
 
 use crate::*;
 use wasm_bindgen::prelude::*;
-use web_sys::CanvasRenderingContext2d;
-use web_sys::HtmlCanvasElement;
 use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
 
 use crate::track::*;
@@ -18,22 +16,44 @@ pub struct NoteBox {
     pub audio: Option<AudioBuffer>,
 }
 
-fn get_actx() -> AudioContext {
-    AudioContext::new().unwrap_throw()
-}
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct PianoConfig {
     pub tracks: Vec<Track>,
     pub insts: Vec<usize>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct RuntimeData {
     pub sel_inst: usize,
     pub sel_track: usize,
     pub maxnote: usize,
     pub pause: bool,
+
+    pub notew: f64,
+    pub cellw: f64,
+    pub cellh: f64,
+    pub borde: f64,
+    pub titlw: f64,
+    pub tablw: f64,
+    pub tablh: f64,
+}
+
+impl RuntimeData {
+    pub fn new() -> RuntimeData {
+        RuntimeData {
+            sel_inst: 0,
+            sel_track: 0,
+            maxnote: 0,
+            pause: false,
+            notew: 20f64,
+            cellw: 80f64,
+            cellh: 20f64,
+            borde: 1f64,
+            titlw: 60f64,
+            tablw: 1900f64,
+            tablh: 1000f64,
+        }
+    }
 }
 
 impl PianoConfig {

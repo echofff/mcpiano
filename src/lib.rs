@@ -38,7 +38,7 @@ pub fn l(s: String) {
 pub struct PianoGlobal {
     actx: AudioContext,
     cctx: CanvasRenderingContext2d,
-    _canv: HtmlCanvasElement,
+    canv: HtmlCanvasElement,
     sounds: Vec<NoteBox>,
 
     config: PianoConfig,
@@ -52,19 +52,22 @@ impl PianoGlobal {
         //let mut notes: Vec<NoteBox> = conf.into_serde().unwrap_throw();
         let sounds = Self::create_soundbox(&actx).await;
 
-        let (_canv, cctx) = Self::scanvas();
+        let (canv, cctx) = Self::scanvas();
 
         let config = PianoConfig::new();
 
-        PianoGlobal {
+        let mut p = PianoGlobal {
             actx,
             cctx,
-            _canv,
+            canv,
             sounds,
 
             config,
-            rtd: Default::default(),
-        }
+            rtd: RuntimeData::new(),
+        };
+
+        p.resize(40);
+        p
     }
 }
 

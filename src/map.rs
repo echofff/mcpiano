@@ -1,11 +1,3 @@
-pub const NOTEW: f64 = 20f64;
-pub const CELLW: f64 = 80f64;
-pub const CELLH: f64 = 20f64;
-pub const BORDE: f64 = 1f64;
-pub const TITLW: f64 = 60f64;
-pub const TABLW: f64 = 1900f64;
-pub const TABLH: f64 = 1000f64;
-
 pub const TITLE: [&str; 28] = [
     "0_F#", "1_G", "2_G#", "3_A", "4_A#", "5_B", "6_C", "7_C#", "8_D", "9_D#", "10_E", "11_F",
     "12_F#", "13_G", "14_G#", "15_A", "16_A#", "17_B", "18_C", "19_C#", "20_D", "21_D#", "22_E",
@@ -68,4 +60,4 @@ pub const TIME_MARK: [&str; 18] = [
     "minecraft:spruce_fence",
 ];
 
-pub const DUMMY: [&str; 2] = ["minecraft:birch_fence", "minecraft:spruce_fence"];
+//pub const DUMMY: [&str; 2] = ["minecraft:birch_fence", "minecraft:spruce_fence"];

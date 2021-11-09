@@ -34,4 +34,3 @@ impl DerefMut for Track {
         &mut self.notes
     }
 }
-
