@@ -23,16 +23,20 @@ impl PianoGlobal {
             }
         };
     }
-}
 
-impl PianoGlobal {
-    pub fn resize(&mut self, n: usize) {
+    pub fn resize(&mut self, n: i32) {
+        if n < 0 {
+            return;
+        }
+        self.shunk();
         let max_note = self.tracks.iter().map(|a| a.len()).max().unwrap_throw();
-        let tar = max_note.max(n);
+        let tar = max_note.max(n as usize);
 
         self.tracks
             .iter_mut()
             .for_each(|t| t.resize(tar, Default::default()));
+
+        self.rtd.maxnote = tar * 4;
 
         let width = self.rtd.titlw + self.rtd.cellw * tar as f64;
         let height = self.rtd.cellh * (self.tracks.len() + 25) as f64;
@@ -44,5 +48,23 @@ impl PianoGlobal {
         self.canv.set_height(height as u32);
 
         self.draw_all();
+        //alert("asdfasdf");
+    }
+
+    pub fn shunk(&mut self) {
+        let mut last = self.rtd.maxnote / 4 - 1;
+
+        while self.tracks.iter().all(|t| {
+            if let Some(Note { beat: 0, .. }) = t.get(last) {
+                true
+            } else {
+                false
+            }
+        }) {
+            self.tracks.iter_mut().for_each(|t| {
+                t.pop();
+            });
+            last -= 1;
+        }
     }
 }
