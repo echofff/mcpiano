@@ -42,6 +42,14 @@
                     s.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(pc.save()))
                     s.click()
                 }
+                    alert("asdfasd")
+                g("savec").onclick = () => {
+                    alert("asdfasd")
+                    var s = document.createElement("a")
+                    s.setAttribute("download", "mcpianoc.txt")
+                    s.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(pc.save_comp()))
+                    s.click()
+                }
                 g("notes").onchange = (event) => {
                     pc.resize(event.target.value)
                 }
@@ -85,6 +93,8 @@
     <input id="export" type="button" value="导出为mc指令" />
     <input id="save" type="button" value="保存" />
     <input id="load" type="file" text="加载" />
+    <input id="savec" type="button" value="保存 comp" />
+    <input id="loadc" type="file" text="加载 comp" />
     <span>音符数量:</span>
     <input type="number" value="20" id="notes" />
     <span>新音轨音色:</span>
