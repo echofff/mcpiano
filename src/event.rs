@@ -12,7 +12,7 @@ impl PianoGlobal {
         down: i32,
         left: i32,
         _shift: bool,
-        _ctrl: bool,
+        ctrl: bool,
         _alt: bool,
     ) {
         let ylimit = self.tracks.len() * self.rtd.cellh as usize;
@@ -29,7 +29,8 @@ impl PianoGlobal {
         let (ni, beat) = (xi >> 2, 0b1000 >> (xi & 0b11) as u8);
 
         match (area, down, left) {
-            (Area::EditPlane, 0 | 1, _) => self.click_edit(ni, beat, yi, left),
+            (Area::EditPlane, 0 | 1, 1) => self.click_edit(ni, beat, yi, ctrl),
+            (Area::EditPlane, 0 | 1, 2) => self.click_del(ni, beat, yi, ctrl),
             (Area::TrackSecquence, 0 | 1, 1) => self.click_switch(yi),
             (Area::InstTitle, 0, 1) => self.click_play(yi as u8),
             (Area::TrackControl, 0, 1) => self.click_control(xi & 0b11, yi),
@@ -64,7 +65,7 @@ impl PianoGlobal {
         self.draw_all();
     }
 
-    pub fn click_edit(&mut self, ni: usize, beat: u8, y: usize, key: i32) {
+    pub fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let select = self.rtd.sel_inst;
 
         if let Some(Some(n)) = self
@@ -80,12 +81,14 @@ impl PianoGlobal {
                 }
             })
         {
-            if key == 1 && n.beat & beat == 0 {
-                n.beat |= beat;
+            if n.beat & beat == 0 {
+                if !shift {
+                    n.beat |= beat;
+                } else {
+                    n.beat = 0b1111;
+                }
                 self.draw_all();
-            } else if key == 2 && n.beat & !beat == 0 {
-                n.beat ^= !beat;
-                self.draw_all();
+                self.play(select as u8, 24 - y as u8);
             }
         } else if let Some(Some(n)) = self
             .tracks
@@ -95,24 +98,39 @@ impl PianoGlobal {
             .find(|n| if let Some(n) = n { n.beat == 0 } else { false })
         {
             n.note = 24 - y as u8;
-            if key == 1 && n.beat & beat == 0 {
-                n.beat |= beat;
+            if n.beat & beat == 0 {
+                if !shift {
+                    n.beat |= beat;
+                } else {
+                    n.beat = 0b1111;
+                }
                 self.draw_all();
-            } else if key == 2 && n.beat & !beat == 0 {
-                n.beat ^= !beat;
-                self.draw_all();
+                self.play(select as u8, 24 - y as u8);
             }
         }
     }
-
 
     pub fn click_play(&mut self, ic: u8) {
         self.play(self.rtd.sel_inst as u8, 24 - ic);
     }
 
-    pub fn click_del(&mut self, tc: u8, time: usize) {
-        if let Some(n) = self.tracks[tc as usize].notes.get_mut(time >> 2) {
-            n.beat &= !(0b1000 >> (time & 3));
+    pub fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
+        let mut change = false;
+        self.tracks.iter_mut().map(|t| t.get_mut(ni)).for_each(|n| {
+            if let Some(n) = n {
+                if n.note == 24 - y as u8 {
+                    if (n.beat & beat) == beat && !shift {
+                        n.beat &= !beat;
+                        change = true;
+                    }
+                    if shift {
+                        change = n.beat != 0;
+                        n.beat = 0;
+                    }
+                }
+            }
+        });
+        if change {
             self.draw_all();
         }
     }

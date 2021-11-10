@@ -75,7 +75,7 @@ impl Theme {
 impl RuntimeData {
     pub fn new() -> RuntimeData {
         RuntimeData {
-            sel_inst: 12,
+            sel_inst: 11,
             maxnote: 20,
             pause: false,
             notew: 20f64,
