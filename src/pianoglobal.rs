@@ -24,7 +24,6 @@ pub struct PianoConfig {
 
 pub struct RuntimeData {
     pub sel_inst: usize,
-    pub sel_track: usize,
     pub maxnote: usize,
     pub pause: bool,
 
@@ -76,8 +75,7 @@ impl Theme {
 impl RuntimeData {
     pub fn new() -> RuntimeData {
         RuntimeData {
-            sel_inst: 0,
-            sel_track: 0,
+            sel_inst: 12,
             maxnote: 0,
             pause: false,
             notew: 20f64,

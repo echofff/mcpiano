@@ -14,7 +14,6 @@ impl PianoGlobal {
         self.cctx
             .clear_rect(0f64, 0f64, self.rtd.tablw, self.rtd.tablh);
 
-        //self.flesh_insts();
         self.draw_insts();
         self.draw_backline();
         self.draw_tracks();
@@ -41,21 +40,21 @@ impl PianoGlobal {
     }
 
     pub fn draw_tracks(&self) {
-        self.tracks.iter().enumerate().for_each(|(i, t)| {
-            if i != self.rtd.sel_track {
-                self.draw_track(t, i);
-            }
-        });
 
         self.tracks
-            .get(self.rtd.sel_track)
-            .map(|t| self.draw_track(t, self.rtd.sel_track));
+            .iter()
+            .enumerate()
+            .filter(|(_, t)| t.inst != self.rtd.sel_inst)
+            .for_each(|(i, t)| self.draw_track(t, i));
+        self.tracks
+            .iter()
+            .enumerate()
+            .filter(|(_, t)| t.inst == self.rtd.sel_inst)
+            .for_each(|(i, t)| self.draw_track(t, i));
     }
 
     pub fn draw_insts(&self) {
-        //let row_styles = [&"#22443322".into(), &"#44223333".into()];
         let c = &self.cctx;
-        //let mut yoffset = self.tracks.len() as f64 * self.rtd.cellh + self.rtd.borde;
         let theme = &self.theme;
         let rt = &self.rtd;
 
@@ -108,7 +107,7 @@ impl PianoGlobal {
 
         // draw control part
         let area = Area::TrackControl;
-        let is_selected = self.rtd.sel_track == ti;
+        let is_selected = self.rtd.sel_inst == t.inst;
 
         self.draw_cube(&theme.control[t.hide as usize], &area, 0, ti);
         self.draw_cube(&theme.control[2], &area, 1, ti);

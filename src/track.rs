@@ -24,7 +24,7 @@ pub struct Track {
 impl Track {
     pub fn new() -> Track {
         let notes = vec![Default::default()];
-        let inst = 0;
+        let inst = 11;
         let hide = false;
         let colo = JsValue::from_str("#9a9dea");
         let colo_s = String::from("#9a9dea");
