@@ -40,7 +40,6 @@ impl PianoGlobal {
     }
 
     pub fn draw_tracks(&self) {
-
         self.tracks
             .iter()
             .enumerate()
@@ -93,7 +92,7 @@ impl PianoGlobal {
 
         // draw darker line
         c.set_stroke_style(line[0]);
-        (0..self.rtd.maxnote ).into_iter().for_each(|i| {
+        (0..self.rtd.maxnote).into_iter().for_each(|i| {
             let x = self.rtd.titlw + i as f64 * self.rtd.cellw;
             c.move_to(x, 0f64);
             c.line_to(x, self.rtd.tablh);

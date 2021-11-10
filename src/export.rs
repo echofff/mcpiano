@@ -14,7 +14,6 @@ impl PianoGlobal {
 
             res.push_str(Self::shulk_i(&n, i, true).as_str());
             res.push_str(Self::shulk_i(&b, i, false).as_str());
-
         });
         res
     }

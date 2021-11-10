@@ -66,6 +66,7 @@ impl PianoGlobal {
             .map(|a| a.true_len())
             .max()
             .unwrap_throw();
+
         let tar = max_note.max(n);
         self.rtd.maxnote = tar;
 

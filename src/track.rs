@@ -41,9 +41,9 @@ impl Track {
     }
     pub fn true_len(&self) -> usize {
         if let Some((i, _)) = self.iter().enumerate().rev().find(|(_, n)| n.beat != 0) {
-            i+1
+            i + 1
         } else {
-            self.len()
+            0
         }
     }
 }
