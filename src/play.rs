@@ -29,7 +29,7 @@ impl PianoGlobal {
         self.tracks.iter().for_each(|t| {
             if let Some(n) = t.notes.get(ni) {
                 if (n.beat & (0b1000 >> bi)) != 0 {
-                    self.play(n.inst, n.note)
+                    self.play(t.inst as u8, n.note)
                 };
             };
         });

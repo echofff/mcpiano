@@ -20,6 +20,17 @@ use web_sys::CanvasRenderingContext2d;
 use web_sys::HtmlCanvasElement;
 use web_sys::{AudioContext, Request, RequestInit, Response};
 
+//use wee_alloc;
+//#[cfg(feature = "wee_alloc")]
+//#[global_allocator]
+//
+
+
+extern crate wee_alloc;
+
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);

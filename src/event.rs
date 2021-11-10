@@ -29,9 +29,8 @@ impl PianoGlobal {
                 (x - xlimit) as usize / self.rtd.notew as usize,
                 false,
             ),
-            (0, true, false, 1) => self.click_del(
-                (y / self.rtd.cellh as i32) as u8,
-                (x - xlimit) as usize / self.rtd.notew as usize,
+            (0, true, false, 1) => self.click_switch(
+                (y / self.rtd.cellh as i32) as usize
             ),
             (0, false, true, 1) => self.click_play(((y - ylimit) / self.rtd.cellh as i32) as u8),
             (0, false, false, 1) => {
@@ -64,6 +63,11 @@ impl PianoGlobal {
 }
 
 impl PianoGlobal {
+    pub fn click_switch(&mut self, i: usize) {
+        self.rtd.sel_track = i;
+        self.draw_all();
+    }
+
     pub fn click_edit(&mut self, ic: u8, time: usize, on: bool) {
         let inote = time >> 2;
         let beat = 0b1000 >> (time & 0b11);

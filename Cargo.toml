@@ -9,14 +9,17 @@ crate-type = ["cdylib", "rlib"]
 
 #[features]
 #default = ["console_error_panic_hook"]
+#[features]
+#default = ["wee_alloc"]
+#wee_alloc = "*"
 
 [dependencies]
 wasm-bindgen = {version = "*",features = ["serde-serialize"]}
 serde = {version = "*", features = ["derive"]}
-#serde_derive = "*"
 serde_json = "*"
 js-sys = "*"
 wasm-bindgen-futures = "*"
+wee_alloc = { version = "0.4.5" }
 
 
 [dependencies.web-sys]
@@ -30,12 +33,7 @@ features = [
   'AudioParam',
   'CanvasRenderingContext2d',
   'Document',
-  'Element',
-  'GainNode',
-  'Headers',
   'HtmlCanvasElement',
-  'OscillatorNode',
-  'OscillatorType',
   'Request',
   'RequestInit',
   'RequestMode',
@@ -47,14 +45,15 @@ features = [
 # logging them with `console.error`. This is great for development, but requires
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
 # code size when deploying.
-console_error_panic_hook = { version = "0.1.6", optional = true }
+
+#console_error_panic_hook = { version = "0.1.6", optional = true }
 
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. It is slower than the default
 # allocator, however.
 #
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
-wee_alloc = { version = "0.4.5", optional = true }
+#wee_alloc = { version = "0.4.5", optional = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
@@ -62,3 +61,4 @@ wasm-bindgen-test = "0.3.13"
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
+lto = "true"

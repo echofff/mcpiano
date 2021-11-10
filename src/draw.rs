@@ -69,7 +69,7 @@ impl PianoGlobal {
         (0..25).into_iter().for_each(|i| {
             let y = (self.tracks.len() + i) as f64 * rt.cellh;
 
-            c.set_fill_style(&theme.note_row[i % theme.note_row.len()]);
+            c.set_fill_style(&theme.note_row[(24-i) % theme.note_row.len()]);
             c.fill_rect(0f64, y, rt.tablw, rt.cellh);
 
             c.set_fill_style(&"black".into());

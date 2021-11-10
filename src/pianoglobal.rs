@@ -16,13 +16,12 @@ pub struct NoteBox {
     pub audio: Option<AudioBuffer>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[derive( Clone, serde::Deserialize, serde::Serialize)]
 pub struct PianoConfig {
     pub tracks: Vec<Track>,
     //pub insts: Vec<usize>,
 }
 
-#[derive(Debug)]
 pub struct RuntimeData {
     pub sel_inst: usize,
     pub sel_track: usize,

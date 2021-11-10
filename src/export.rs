@@ -43,7 +43,7 @@ impl PianoGlobal {
                 )]
                 .into_iter();
 
-                let end=vec![format!("]}}}},\"Slot\":{},\"Count\":1}}",si)].into_iter();
+                let end=vec![format!("]}}}},\"Slot\":{},\"Count\":1}},",si)].into_iter();
 
                 start.chain(b).chain(end)
             });

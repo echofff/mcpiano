@@ -2,14 +2,13 @@ use std::ops::{Deref, DerefMut};
 
 use wasm_bindgen::JsValue;
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Clone, serde::Deserialize, serde::Serialize, Default)]
 pub struct Note {
-    pub inst: u8,
     pub note: u8,
     pub beat: u8,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive( Clone, serde::Deserialize, serde::Serialize, Default)]
 pub struct Track {
     pub inst: usize,
     pub hide: bool,
