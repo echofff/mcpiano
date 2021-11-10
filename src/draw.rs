@@ -69,7 +69,7 @@ impl PianoGlobal {
         (0..25).into_iter().for_each(|i| {
             let y = (self.tracks.len() + i) as f64 * rt.cellh;
 
-            c.set_fill_style(&theme.note_row[(24-i) % theme.note_row.len()]);
+            c.set_fill_style(&theme.note_row[(24 - i) % theme.note_row.len()]);
             c.fill_rect(0f64, y, rt.tablw, rt.cellh);
 
             c.set_fill_style(&"black".into());
@@ -146,6 +146,7 @@ impl PianoGlobal {
             Area::TrackControl => (0f64, 0f64),
             Area::TrackSecquence => (self.rtd.titlw, 0f64),
             Area::EditPlane => (self.rtd.titlw, self.tracks.len() as f64 * self.rtd.cellh),
+            Area::InstTitle => (0f64, self.tracks.len() as f64 * self.rtd.cellh),
         };
         let cv = &self.rtd;
 
@@ -174,4 +175,5 @@ pub enum Area {
     TrackControl,
     TrackSecquence,
     EditPlane,
+    InstTitle,
 }
