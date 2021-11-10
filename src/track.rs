@@ -8,7 +8,7 @@ pub struct Note {
     pub beat: u8,
 }
 
-#[derive( Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Clone, serde::Deserialize, serde::Serialize, Default)]
 pub struct Track {
     pub inst: usize,
     pub hide: bool,
@@ -38,6 +38,13 @@ impl Track {
     }
     pub fn deleteable(&self) -> bool {
         self.iter().all(|n| n.beat == 0)
+    }
+    pub fn true_len(&self) -> usize {
+        if let Some((i, _)) = self.iter().enumerate().rev().find(|(_, n)| n.beat != 0) {
+            i+1
+        } else {
+            self.len()
+        }
     }
 }
 

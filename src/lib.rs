@@ -82,7 +82,7 @@ impl PianoGlobal {
             theme,
         };
 
-        p.resize(20);
+        p.resize(-1);
         p
     }
 }

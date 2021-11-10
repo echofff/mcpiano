@@ -22,7 +22,7 @@ impl PianoGlobal {
         let ni = i >> 2;
         let bi = i & 3;
 
-        if self.rtd.maxnote < i {
+        if self.rtd.maxnote *4 < i {
             self.rtd.pause = true;
         }
 

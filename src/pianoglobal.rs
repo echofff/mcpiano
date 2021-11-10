@@ -76,7 +76,7 @@ impl RuntimeData {
     pub fn new() -> RuntimeData {
         RuntimeData {
             sel_inst: 12,
-            maxnote: 0,
+            maxnote: 20,
             pause: false,
             notew: 20f64,
             cellw: 80f64,

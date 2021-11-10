@@ -49,7 +49,7 @@ impl PianoGlobal {
                 if let Some(true) = self.tracks.get(i as usize).map(|t| t.deleteable()) {
                     if self.tracks.len() > 1 {
                         self.tracks.remove(i as usize);
-                        self.resize(0);
+                        self.resize(-1);
                     }
                 }
             }

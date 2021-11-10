@@ -58,18 +58,22 @@ impl PianoGlobal {
     }
 
     pub fn resize(&mut self, n: i32) {
-        if n < 0 {
-            return;
-        }
+        let n = if n < 0 { self.rtd.maxnote } else { n as usize };
+
+        let max_note = self
+            .tracks
+            .iter()
+            .map(|a| a.true_len())
+            .max()
+            .unwrap_throw();
+        let tar = max_note.max(n);
+        self.rtd.maxnote = tar;
+
         self.shunk();
-        let max_note = self.tracks.iter().map(|a| a.len()).max().unwrap_throw();
-        let tar = max_note.max(n as usize);
 
         self.tracks
             .iter_mut()
             .for_each(|t| t.resize(tar, Default::default()));
-
-        self.rtd.maxnote = tar * 4;
 
         let width = self.rtd.titlw + self.rtd.cellw * tar as f64;
         let height = self.rtd.cellh * (self.tracks.len() + 25) as f64;
@@ -85,11 +89,11 @@ impl PianoGlobal {
     }
 
     pub fn shunk(&mut self) {
-        let mut last = self.rtd.maxnote / 4 - 1;
+        let mut last = self.rtd.maxnote - 1;
 
         while self.tracks.iter().all(|t| {
             if let Some(Note { beat: 0, .. }) = t.get(last) {
-                true
+                true && t.len() > self.rtd.maxnote
             } else {
                 false
             }
