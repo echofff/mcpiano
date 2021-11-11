@@ -68,6 +68,17 @@
                     reader.readAsText(files[0]);
 
                 }
+                g("loadmidi").onchange = (event) => {
+                    let files = event.target.files; // FileList object
+                    let reader = new FileReader();
+
+                    reader.onload = (f) => {
+                        pc.load_midi(new Uint8Array(f.target.result))
+                    };
+
+                    reader.readAsArrayBuffer(files[0]);
+
+                }
                 g("addtrack").onclick = () => {
                     pc.add_track(g("sel").value,
                         g("col").value)
@@ -99,7 +110,6 @@
                         g("play").onclick()
                         return false
                     } else if (pc.input_key(e.keyCode)) {
-                        //console.log(e)
                         return true
                     } else {
                         return false
@@ -144,6 +154,7 @@
     <input type="color" id="col" value="#44cccc" />
     <input id="addtrack" type="button" value="增加音轨" />
     <input id="volumn" type="range" min="0" max="1" step="0.01" value="0.7" />
+    <input id="loadmidi" type="file" text="加载midi" />
 
     <br />
 

@@ -6,7 +6,6 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-
 #[features]
 #default = ["console_error_panic_hook"]
 #[features]
@@ -20,6 +19,7 @@ serde_json = "*"
 js-sys = "*"
 wasm-bindgen-futures = "*"
 wee_alloc = { version = "0.4.5" }
+midly = {version = "*", default-features = false, features = ["std","alloc"]}
 
 
 [dependencies.web-sys]

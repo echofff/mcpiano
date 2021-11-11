@@ -91,6 +91,14 @@ impl PianoGlobal {
         self.draw_all();
         //alert("asdfasdf");
     }
+
+    pub fn load_midi(&mut self, midi: &mut [u8]) {
+        if let Ok(mi) = midly::Smf::parse(midi) {
+            crate::alert(format!("--{}--", mi.tracks.len()).as_str());
+        } else {
+            crate::alert("failed");
+        }
+    }
 }
 
 impl PianoGlobal {
