@@ -17,7 +17,7 @@ impl PianoGlobal {
     ) {
         let (xi, yi) = (x / self.rtd.cube_w as usize, y / self.rtd.cube_h as usize);
 
-        self.rtd.pos = if (xi, yi) == self.rtd.pos {
+        self.rtd.pos = if (xi, yi) == self.rtd.pos && cata == 1 {
             return;
         } else {
             (xi, yi)
@@ -41,6 +41,7 @@ impl PianoGlobal {
             (Area::TrackControl, 0, 1) => self.click_control(xi & 0b11, yi),
             _ => {}
         }
+        self.draw_all();
     }
 }
 
@@ -49,7 +50,7 @@ impl PianoGlobal {
         match f {
             0 => {
                 self.tracks.get_mut(i as usize).map(|t| t.hide = !t.hide);
-                self.draw_all();
+                //self.draw_all();
             }
             1 => {
                 if let Some(true) = self
@@ -63,13 +64,13 @@ impl PianoGlobal {
             }
             _ => {
                 self.rtd.sel_inst = self.tracks[i].inst;
-                self.draw_all();
+                //self.draw_all();
             }
         }
     }
     fn click_switch(&mut self, i: usize) {
         self.rtd.sel_inst = self.tracks[i].inst;
-        self.draw_all();
+        //self.draw_all();
     }
 
     fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
@@ -88,7 +89,7 @@ impl PianoGlobal {
                 } else {
                     n.beat = 0b1111;
                 }
-                self.draw_all();
+                //self.draw_all();
                 self.play(select as u8, 24 - y as u8);
             }
         } else if let Some(n) = self
@@ -105,7 +106,7 @@ impl PianoGlobal {
                 } else {
                     n.beat = 0b1111;
                 }
-                self.draw_all();
+                //self.draw_all();
                 self.play(select as u8, 24 - y as u8);
             }
         }
@@ -131,7 +132,7 @@ impl PianoGlobal {
                 }
             });
         if change {
-            self.draw_all();
+            //self.draw_all();
         }
     }
 }
