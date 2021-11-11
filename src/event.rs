@@ -44,6 +44,31 @@ impl PianoGlobal {
         }
         self.draw_all();
     }
+
+    pub fn input_key(&mut self, key: usize) -> bool {
+        let (x, _) = self.rtd.pos;
+        match key {
+            38 => self
+                .tracks
+                .iter_mut()
+                .filter(|t| !t.hide)
+                .filter_map(|t| t.get_mut((x - 4) >> 2))
+                .filter(|n| n.note < 24)
+                .for_each(|n| n.note += 1),
+            40 => self
+                .tracks
+                .iter_mut()
+                .filter(|t| !t.hide)
+                .filter_map(|t| t.get_mut((x - 4) >> 2))
+                .filter(|n| n.note > 0)
+                .for_each(|n| n.note -= 1),
+
+            _ => return true,
+        }
+
+        self.draw_all();
+        false
+    }
 }
 
 impl PianoGlobal {

@@ -16,23 +16,23 @@
                 var g = (e) => document.getElementById(e);
                 window.pc = e;
                 e.draw_all();
-                    pc.resize(g("notes").value)
+                pc.resize(g("notes").value)
 
 
                 var playone = () => {
-                    if (pc.play_stage()){
+                    if (pc.play_stage()) {
                         window.to = setTimeout(playone, 100)
                     }
                 }
 
 
                 g("play").onclick = () => {
-                    if(pc.play_start())
+                    if (pc.play_start())
                         playone()
                     else
                         clearTimeout(window.to)
                 }
-                    
+
 
                 g("export").onclick = () => {
                     var s = document.createElement("a")
@@ -90,7 +90,19 @@
                 }
                 c.onmousedown = (e) => {inp(e, 0)}
                 c.onmousemove = (e) => {inp(e, 1)}
-                c.onmouseup = (e) => {inp(e, 2)}
+                c.onmouseup = (e) => {
+                    inp(e, 2)
+                }
+                window.onkeydown = (e) => {
+                    if (e.keyCode == 32) {
+                        g("play").onclick()
+                    } else if (pc.input_key(e.keyCode)) {
+                        console.log(e)
+                        return true
+                    } else {
+                        return false
+                    }
+                }
             })
         }
 
@@ -127,14 +139,14 @@
     <span>新音轨颜色:</span>
     <input type="color" id="col" value="#44cccc" />
     <input id="addtrack" type="button" value="增加音轨" />
-    <input id="volumn" type="range" min="0" max="1" step="0.01" value="0.7"/>
+    <input id="volumn" type="range" min="0" max="1" step="0.01" value="0.7" />
 
     <br />
 
-    <canvas width=10 height=10 style="position:relative;border:1px black solid;" id="canvas">
+    <canvas width=10 height=10 style="position:relative;border:1px black solid;" id="canvas" onkeydown="test(event)">
     </canvas>
 
-    <table>
+    <table id="tab">
         <tr>
             <th>班卓琴</th>
             <th>干草块</th>
