@@ -174,7 +174,11 @@ impl PianoGlobal {
 
         self.cctx.set_fill_style(&self.theme.play);
         let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
-        self.draw_vert(ni, beat)
+        self.draw_vert(ni, beat);
+
+        self.cctx.set_fill_style(&self.theme.hover);
+        let (ni, beat) = ((self.rtd.pos.0 >> 2) - 1, 0b1000 >> (self.rtd.pos.0 & 0b11));
+        self.draw_vert(ni, beat);
     }
 
     fn draw_vert(&self, ni: usize, beat: u8) {
