@@ -30,6 +30,7 @@ features = [
   'AudioContext',
   'AudioDestinationNode',
   'AudioNode',
+  'GainNode',
   'AudioParam',
   'CanvasRenderingContext2d',
   'Document',

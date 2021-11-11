@@ -4,12 +4,21 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl PianoGlobal {
+    pub fn set_volumn(&mut self, volumn: f32) {
+        self.rtd.volumn = volumn;
+    }
     pub fn play(&self, inst: u8, note: u8) {
         let a = self.actx.create_buffer_source().unwrap_throw();
+        let g = self.actx.create_gain().unwrap_throw();
+
         a.set_buffer(self.sounds[inst as usize].audio.as_ref());
         a.detune().set_value((note as f32 - 12f32) * 100f32);
-        a.connect_with_audio_node(&self.actx.destination())
+        g.gain().set_value(self.rtd.volumn);
+
+        a.connect_with_audio_node(&g).expect_throw("connect play");
+        g.connect_with_audio_node(&self.actx.destination())
             .expect_throw("connect play");
+
         a.start().expect_throw("start play");
     }
 

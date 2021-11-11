@@ -28,6 +28,7 @@ pub struct RuntimeData {
     pub pause: bool,
 
     pub pos: (usize, usize),
+    pub volumn: f32,
 
     // u8 is beat, in fromat 0bxxxx
     pub error_hl: Vec<(usize, u8)>,
@@ -98,6 +99,7 @@ impl RuntimeData {
             sel_inst: 11,
             maxnote: 20,
             pause: true,
+            volumn: 0.7f32,
             pos: (0, 0),
             cube_w: 20f64,
             cube_h: 20f64,
