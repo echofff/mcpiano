@@ -35,7 +35,10 @@ impl PianoGlobal {
         match serde_json::from_str(json.as_str()) {
             Ok(c) => {
                 self.config = c;
-                self.draw_all();
+                self.tracks
+                    .iter_mut()
+                    .for_each(|t| t.colo = t.colo_s.clone().into());
+                self.resize(-1)
             }
             Err(e) => {
                 l(format!("load filed by {:?}", e));
