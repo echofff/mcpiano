@@ -38,7 +38,7 @@ impl PianoGlobal {
 }
 
 impl PianoGlobal {
-    pub fn click_control(&mut self, f: usize, i: usize) {
+    fn click_control(&mut self, f: usize, i: usize) {
         match f {
             0 => {
                 self.tracks.get_mut(i as usize).map(|n| n.hide = !n.hide);
@@ -58,12 +58,12 @@ impl PianoGlobal {
             }
         }
     }
-    pub fn click_switch(&mut self, i: usize) {
+    fn click_switch(&mut self, i: usize) {
         self.rtd.sel_inst = self.tracks[i].inst;
         self.draw_all();
     }
 
-    pub fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
+    fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let select = self.rtd.sel_inst;
 
         if let Some(Some(n)) = self
@@ -108,11 +108,11 @@ impl PianoGlobal {
         }
     }
 
-    pub fn click_play(&mut self, ic: u8) {
+    fn click_play(&mut self, ic: u8) {
         self.play(self.rtd.sel_inst as u8, 24 - ic);
     }
 
-    pub fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
+    fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let mut change = false;
         self.tracks.iter_mut().map(|t| t.get_mut(ni)).for_each(|n| {
             if let Some(n) = n {

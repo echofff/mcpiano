@@ -88,8 +88,10 @@ impl PianoGlobal {
         self.draw_all();
         //alert("asdfasdf");
     }
+}
 
-    pub fn shunk(&mut self) {
+impl PianoGlobal {
+    fn shunk(&mut self) {
         let mut last = self.rtd.maxnote - 1;
 
         while self.tracks.iter().all(|t| {

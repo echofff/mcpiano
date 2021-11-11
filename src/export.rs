@@ -19,7 +19,7 @@ impl PianoGlobal {
     }
 }
 impl PianoGlobal {
-    pub fn shulk_i(n: &Vec<Vec<(u8, usize)>>, i: usize, note: bool) -> String {
+    fn shulk_i(n: &Vec<Vec<(u8, usize)>>, i: usize, note: bool) -> String {
         let typ = if note { "音符" } else { "节奏" };
 
         let shulkstart = vec![ format!( "\n\r\n\r第{}条{}\n\r/give @p minecraft:chest{{\"display\":{{\"Name\":\"{{\\\"text\\\":\\\"音轨#{}  {}序列\\\"}}\"}},\"BlockEntityTag\":{{\"Items\":[",i+1,typ,i+1,typ)].into_iter();
@@ -55,7 +55,7 @@ impl PianoGlobal {
             .join("")
     }
 
-    pub fn track_pre(t: &Track) -> (Vec<Vec<(u8, usize)>>, Vec<Vec<(u8, usize)>>) {
+    fn track_pre(t: &Track) -> (Vec<Vec<(u8, usize)>>, Vec<Vec<(u8, usize)>>) {
         let mut org = t.notes.iter().map(|n| {
             if n.beat == 0 {
                 (25, 0)
