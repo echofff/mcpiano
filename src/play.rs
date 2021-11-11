@@ -27,10 +27,9 @@ impl PianoGlobal {
             self.tracks
                 .iter()
                 .filter_map(|t| t.get(ni).map(|n| (t.inst, n)))
+                .filter(|(_, n)| n.beat & beat != 0)
                 .for_each(|(inst, n)| {
-                    if (n.beat & beat) != 0 {
-                        self.play(inst as u8, n.note);
-                    };
+                    self.play(inst as u8, n.note);
                 });
             true
         } else {

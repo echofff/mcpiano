@@ -40,11 +40,12 @@ impl Track {
         self.iter().all(|n| n.beat == 0)
     }
     pub fn true_len(&self) -> usize {
-        if let Some((i, _)) = self.iter().enumerate().rev().find(|(_, n)| n.beat != 0) {
-            i + 1
-        } else {
-            0
-        }
+        self.iter()
+            .enumerate()
+            .rev()
+            .find(|(_, n)| n.beat != 0)
+            .map(|(i, _)| i + 1)
+            .unwrap_or(0)
     }
 }
 

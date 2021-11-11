@@ -45,11 +45,13 @@ impl PianoGlobal {
                 self.draw_all();
             }
             1 => {
-                if let Some(true) = self.tracks.get(i as usize).map(|t| t.deleteable()) {
-                    if self.tracks.len() > 1 {
-                        self.tracks.remove(i as usize);
-                        self.resize(-1);
-                    }
+                if let Some(true) = self
+                    .tracks
+                    .get(i as usize)
+                    .map(|t| t.deleteable() && t.len() > 1)
+                {
+                    self.tracks.remove(i as usize);
+                    self.resize(-1);
                 }
             }
             _ => {
@@ -66,18 +68,14 @@ impl PianoGlobal {
     fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let select = self.rtd.sel_inst;
 
-        if let Some(Some(n)) = self
+
+
+        if let Some(n) = self
             .tracks
             .iter_mut()
             .filter(|t| t.inst == select)
-            .map(|t| t.get_mut(ni))
-            .find(|n| {
-                if let Some(n) = n {
-                    n.note == 24 - y as u8
-                } else {
-                    false
-                }
-            })
+            .filter_map(|t| t.get_mut(ni))
+            .find(|n| n.note == 24 - y as u8)
         {
             if n.beat & beat == 0 {
                 if !shift {
@@ -88,12 +86,12 @@ impl PianoGlobal {
                 self.draw_all();
                 self.play(select as u8, 24 - y as u8);
             }
-        } else if let Some(Some(n)) = self
+        } else if let Some(n) = self
             .tracks
             .iter_mut()
             .filter(|t| t.inst == select)
-            .map(|t| t.get_mut(ni))
-            .find(|n| if let Some(n) = n { n.beat == 0 } else { false })
+            .filter_map(|t| t.get_mut(ni))
+            .find(|n| n.beat == 0)
         {
             n.note = 24 - y as u8;
             if n.beat & beat == 0 {
