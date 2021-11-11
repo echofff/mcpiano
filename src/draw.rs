@@ -15,10 +15,17 @@ impl PianoGlobal {
         self.draw_backline();
         self.draw_hightlight();
         self.draw_tracks();
+        self.draw_hover();
     }
 }
 
 impl PianoGlobal {
+    fn draw_hover(&self) {
+        let (x, y) = self.rtd.pos;
+        self.cctx.set_fill_style(&self.theme.hover);
+        self.draw_rect(x & !0b11, y, 4, 1, false);
+        self.draw_rect(x, y, 1, 1, false);
+    }
     fn draw_tracks(&self) {
         self.tracks
             .iter()

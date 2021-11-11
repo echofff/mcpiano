@@ -27,6 +27,8 @@ pub struct RuntimeData {
     pub maxnote: usize,
     pub pause: bool,
 
+    pub pos: (usize, usize),
+
     // u8 is beat, in fromat 0bxxxx
     pub error_hl: Vec<(usize, u8)>,
     pub select_hl: Vec<(usize, u8)>,
@@ -52,6 +54,8 @@ pub struct Theme {
     pub sel: JsValue,
     pub error: JsValue,
     pub play: JsValue,
+
+    pub hover: JsValue,
 }
 
 impl Theme {
@@ -83,6 +87,7 @@ impl Theme {
             sel: "#2222cc4".into(),
             error: "#ff4444c4".into(),
             play: "#44cc44c4".into(),
+            hover: "#66cccc44".into(),
         }
     }
 }
@@ -93,6 +98,7 @@ impl RuntimeData {
             sel_inst: 11,
             maxnote: 20,
             pause: true,
+            pos: (0, 0),
             cube_w: 20f64,
             cube_h: 20f64,
             borde: 1f64,

@@ -16,6 +16,13 @@ impl PianoGlobal {
         _alt: bool,
     ) {
         let (xi, yi) = (x / self.rtd.cube_w as usize, y / self.rtd.cube_h as usize);
+
+        self.rtd.pos = if (xi, yi) == self.rtd.pos {
+            return;
+        } else {
+            (xi, yi)
+        };
+
         let ts = self.tracks.len();
         let (area, xi, yi) = match (xi >= 4, yi >= ts) {
             (true, true) => (Area::EditPlane, xi - 4, yi - ts),
