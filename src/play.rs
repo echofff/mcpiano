@@ -27,6 +27,10 @@ impl PianoGlobal {
         !self.rtd.pause
     }
 
+    pub fn play_continue(&self) -> bool {
+        self.rtd.maxnote > self.rtd.play_bt >> 2
+    }
+
     pub fn play_stage(&mut self) -> bool {
         let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
 

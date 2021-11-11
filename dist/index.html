@@ -20,8 +20,9 @@
 
 
                 var playone = () => {
-                    if (pc.play_stage()) {
+                    if (pc.play_continue()) {
                         window.to = setTimeout(playone, 100)
+                        pc.play_stage()
                     }
                 }
 
@@ -96,13 +97,16 @@
                 window.onkeydown = (e) => {
                     if (e.keyCode == 32) {
                         g("play").onclick()
+                        return false
                     } else if (pc.input_key(e.keyCode)) {
-                        console.log(e)
+                        //console.log(e)
                         return true
                     } else {
                         return false
                     }
                 }
+
+                c.focus()
             })
         }
 
