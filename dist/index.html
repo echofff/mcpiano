@@ -13,10 +13,11 @@
         async function run() {
             await init();
             PianoGlobal.new().then((e) => {
+                var g = (e) => document.getElementById(e);
                 window.pc = e;
                 e.draw_all();
+                    pc.resize(g("notes").value)
 
-                var g = (e) => document.getElementById(e);
 
                 var playone = () => {
                     if (pc.play_stage()){
@@ -124,7 +125,7 @@
     <input type="color" id="col" />
     <input id="addtrack" type="button" value="增加音轨" />
     <br />
-    <canvas width=1900 height=1000 style="position:relative;border:1px black solid;" id="canvas">
+    <canvas width=10 height=10 style="position:relative;border:1px black solid;" id="canvas">
     </canvas>
 
     <table>

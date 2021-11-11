@@ -76,7 +76,7 @@ impl PianoGlobal {
             .iter_mut()
             .for_each(|t| t.resize(tar, Default::default()));
 
-        let width = self.rtd.cube_w * (tar + 4) as f64;
+        let width = self.rtd.cube_w * (tar * 4 + 4) as f64;
         let height = self.rtd.cube_h * (self.tracks.len() + 25) as f64;
 
         self.rtd.win_w = width;
