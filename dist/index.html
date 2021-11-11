@@ -18,16 +18,20 @@
 
                 var g = (e) => document.getElementById(e);
 
-                g("play").onclick = () => {
-                    pc.set_pause(false);
-                    var playone = (pi) => {
-                        if (!pc.get_pause()) {
-                            setTimeout(() => playone(pi + 1), 100)
-                            pc.play_stage(pi)
-                        }
+                var playone = () => {
+                    if (pc.play_stage()){
+                        window.to = setTimeout(playone, 100)
                     }
-                    playone(0)
                 }
+
+
+                g("play").onclick = () => {
+                    if(pc.play_start())
+                        playone()
+                    else
+                        clearTimeout(window.to)
+                }
+                    
 
                 g("export").onclick = () => {
                     var s = document.createElement("a")

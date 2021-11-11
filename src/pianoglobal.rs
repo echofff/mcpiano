@@ -30,7 +30,8 @@ pub struct RuntimeData {
     // u8 is beat, in fromat 0bxxxx
     pub error_hl: Vec<(usize, u8)>,
     pub select_hl: Vec<(usize, u8)>,
-    pub play_hl: (usize, u8),
+
+    pub play_bt: usize,
 
     pub notew: f64,
     pub cellw: f64,
@@ -89,7 +90,7 @@ impl RuntimeData {
         RuntimeData {
             sel_inst: 11,
             maxnote: 20,
-            pause: false,
+            pause: true,
             notew: 20f64,
             cellw: 80f64,
             cellh: 20f64,
@@ -100,7 +101,7 @@ impl RuntimeData {
 
             error_hl: Vec::new(),
             select_hl: Vec::new(),
-            play_hl: (0, 0),
+            play_bt: 0,
         }
     }
 }

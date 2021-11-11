@@ -12,26 +12,32 @@ impl PianoGlobal {
             .expect_throw("connect play");
         a.start().expect_throw("start play");
     }
-    pub fn get_pause(&mut self) -> bool {
-        self.rtd.pause
-    }
-    pub fn set_pause(&mut self, p: bool) {
-        self.rtd.pause = p;
-    }
-    pub fn play_stage(&mut self, i: usize) {
-        let ni = i >> 2;
-        let bi = i & 3;
 
-        if self.rtd.maxnote * 4 < i {
+    pub fn play_start(&mut self) -> bool {
+        self.rtd.pause ^= true;
+        !self.rtd.pause
+    }
+
+    pub fn play_stage(&mut self) -> bool {
+        let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
+
+        if self.rtd.maxnote > ni {
+            self.rtd.play_bt += 1;
+            self.draw_all();
+            self.tracks
+                .iter()
+                .filter_map(|t| t.get(ni).map(|n| (t.inst, n)))
+                .for_each(|(inst, n)| {
+                    if (n.beat & beat) != 0 {
+                        self.play(inst as u8, n.note);
+                    };
+                });
+            true
+        } else {
             self.rtd.pause = true;
+            self.rtd.play_bt = 0;
+            self.draw_all();
+            false
         }
-
-        self.tracks.iter().for_each(|t| {
-            if let Some(n) = t.notes.get(ni) {
-                if (n.beat & (0b1000 >> bi)) != 0 {
-                    self.play(t.inst as u8, n.note)
-                };
-            };
-        });
     }
 }

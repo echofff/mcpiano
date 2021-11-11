@@ -16,6 +16,7 @@ impl PianoGlobal {
 
         self.draw_insts();
         self.draw_backline();
+        self.draw_hightlight();
         self.draw_tracks();
     }
 }
@@ -176,14 +177,14 @@ impl PianoGlobal {
             self.draw_vert(&self.theme.error, *ni, *beat);
         });
 
-        let (ni, beat) = self.rtd.play_hl;
+        let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
         self.draw_vert(&self.theme.play, ni, beat)
     }
 
     pub fn draw_vert(&self, color: &JsValue, ni: usize, beat: u8) {
         self.cctx.set_fill_style(color);
         (0..4).into_iter().for_each(|i| {
-            if beat & (0b1000 << i) != 0 {
+            if beat & (0b1000 >> i) != 0 {
                 self.cctx.fill_rect(
                     self.rtd.titlw + ni as f64 * self.rtd.cellw + i as f64 * self.rtd.notew,
                     0f64,
