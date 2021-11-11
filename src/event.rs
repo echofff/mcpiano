@@ -5,30 +5,28 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl PianoGlobal {
-    pub fn click(
+    pub fn input(
         &mut self,
         x: usize,
         y: usize,
-        down: i32,
-        left: i32,
+        cata: i32,
+        key: i32,
         _shift: bool,
         ctrl: bool,
         _alt: bool,
     ) {
-        let ylimit = self.tracks.len() * self.rtd.cellh as usize;
-        let xlimit = self.rtd.titlw as usize;
-
-        let (area, x, y) = match (x > xlimit, y > ylimit) {
-            (true, true) => (Area::EditPlane, x - xlimit, y - ylimit),
-            (true, false) => (Area::TrackSecquence, x - xlimit, y),
-            (false, true) => (Area::InstTitle, x, y - ylimit),
-            (false, false) => (Area::TrackControl, x, y),
-        };
         let (xi, yi) = (x / self.rtd.notew as usize, y / self.rtd.cellh as usize);
+        let ts = self.tracks.len();
+        let (area, xi, yi) = match (xi >= 4, yi >= ts) {
+            (true, true) => (Area::EditPlane, xi - 4, yi - ts),
+            (true, false) => (Area::TrackSecquence, xi - 4, yi),
+            (false, true) => (Area::InstTitle, xi, yi - ts),
+            (false, false) => (Area::TrackControl, xi, yi),
+        };
 
         let (ni, beat) = (xi >> 2, 0b1000 >> (xi & 0b11) as u8);
 
-        match (area, down, left) {
+        match (area, cata, key) {
             (Area::EditPlane, 0 | 1, 1) => self.click_edit(ni, beat, yi, ctrl),
             (Area::EditPlane, 0 | 1, 2) => self.click_del(ni, beat, yi, ctrl),
             (Area::TrackSecquence, 0 | 1, 1) => self.click_switch(yi),

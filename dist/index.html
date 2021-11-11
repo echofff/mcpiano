@@ -80,7 +80,7 @@
                 var inp = (event, down) => {
                     event.stopPropagation();
                     event.preventDefault();
-                    pc.click(event.layerX, event.layerY, down, event.buttons, event.shiftKey, event.ctrlKey, event.altKey)
+                    pc.input(event.layerX, event.layerY, down, event.buttons, event.shiftKey, event.ctrlKey, event.altKey)
                     return false
                 }
                 c.onmousedown = (e) => {inp(e, 0)}
