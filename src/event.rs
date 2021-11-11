@@ -39,6 +39,7 @@ impl PianoGlobal {
             (Area::TrackSecquence, 0 | 1, 1) => self.click_switch(yi),
             (Area::InstTitle, 0, 1) => self.click_play(yi as u8),
             (Area::TrackControl, 0, 1) => self.click_control(xi & 0b11, yi),
+            (Area::TrackSecquence, 0 | 1, 2) => self.click_time(xi),
             _ => {}
         }
         self.draw_all();
@@ -46,6 +47,9 @@ impl PianoGlobal {
 }
 
 impl PianoGlobal {
+    fn click_time(&mut self, t: usize) {
+        self.rtd.play_bt = t;
+    }
     fn click_control(&mut self, f: usize, i: usize) {
         match f {
             0 => {
