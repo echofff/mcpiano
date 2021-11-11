@@ -54,7 +54,7 @@ impl PianoGlobal {
             colo_s,
             notes: Default::default(),
         });
-        self.resize(0);
+        self.resize(-1);
     }
 
     pub fn resize(&mut self, n: i32) {
