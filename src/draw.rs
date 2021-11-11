@@ -167,6 +167,32 @@ impl PianoGlobal {
             cv.cellh * 0.25,
         );
     }
+
+    pub fn draw_hightlight(&self) {
+        self.rtd.select_hl.iter().for_each(|(ni, beat)| {
+            self.draw_vert(&self.theme.sel, *ni, *beat);
+        });
+        self.rtd.error_hl.iter().for_each(|(ni, beat)| {
+            self.draw_vert(&self.theme.error, *ni, *beat);
+        });
+
+        let (ni, beat) = self.rtd.play_hl;
+        self.draw_vert(&self.theme.play, ni, beat)
+    }
+
+    pub fn draw_vert(&self, color: &JsValue, ni: usize, beat: u8) {
+        self.cctx.set_fill_style(color);
+        (0..4).into_iter().for_each(|i| {
+            if beat & (0b1000 << i) != 0 {
+                self.cctx.fill_rect(
+                    self.rtd.titlw + ni as f64 * self.rtd.cellw + i as f64 * self.rtd.notew,
+                    0f64,
+                    self.rtd.notew,
+                    self.rtd.tablh,
+                )
+            }
+        })
+    }
 }
 
 pub enum Area {

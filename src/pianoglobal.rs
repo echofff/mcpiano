@@ -16,7 +16,7 @@ pub struct NoteBox {
     pub audio: Option<AudioBuffer>,
 }
 
-#[derive( Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct PianoConfig {
     pub tracks: Vec<Track>,
     //pub insts: Vec<usize>,
@@ -26,6 +26,11 @@ pub struct RuntimeData {
     pub sel_inst: usize,
     pub maxnote: usize,
     pub pause: bool,
+
+    // u8 is beat, in fromat 0bxxxx
+    pub error_hl: Vec<(usize, u8)>,
+    pub select_hl: Vec<(usize, u8)>,
+    pub play_hl: (usize, u8),
 
     pub notew: f64,
     pub cellw: f64,
@@ -40,6 +45,10 @@ pub struct Theme {
     pub control: [JsValue; 6],
     pub track_row: Vec<JsValue>,
     pub note_row: Vec<JsValue>,
+
+    pub sel: JsValue,
+    pub error: JsValue,
+    pub play: JsValue,
 }
 
 impl Theme {
@@ -68,6 +77,9 @@ impl Theme {
                 "#ffffff".into(),
                 "#ffffff".into(),
             ],
+            sel: "#2222cc4".into(),
+            error: "#ff4444c4".into(),
+            play: "#44cc44c4".into(),
         }
     }
 }
@@ -85,6 +97,10 @@ impl RuntimeData {
             titlw: 80f64,
             tablw: 1900f64,
             tablh: 1000f64,
+
+            error_hl: Vec::new(),
+            select_hl: Vec::new(),
+            play_hl: (0, 0),
         }
     }
 }
