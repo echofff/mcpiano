@@ -76,11 +76,11 @@ impl PianoGlobal {
             .iter_mut()
             .for_each(|t| t.resize(tar, Default::default()));
 
-        let width = self.rtd.titlw + self.rtd.cellw * tar as f64;
-        let height = self.rtd.cellh * (self.tracks.len() + 25) as f64;
+        let width = self.rtd.cube_w * (tar + 4) as f64;
+        let height = self.rtd.cube_h * (self.tracks.len() + 25) as f64;
 
-        self.rtd.tablw = width;
-        self.rtd.tablh = height;
+        self.rtd.win_w = width;
+        self.rtd.win_h = height;
 
         self.canv.set_width(width as u32);
         self.canv.set_height(height as u32);

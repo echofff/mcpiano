@@ -15,7 +15,7 @@ impl PianoGlobal {
         ctrl: bool,
         _alt: bool,
     ) {
-        let (xi, yi) = (x / self.rtd.notew as usize, y / self.rtd.cellh as usize);
+        let (xi, yi) = (x / self.rtd.cube_w as usize, y / self.rtd.cube_h as usize);
         let ts = self.tracks.len();
         let (area, xi, yi) = match (xi >= 4, yi >= ts) {
             (true, true) => (Area::EditPlane, xi - 4, yi - ts),
@@ -41,7 +41,7 @@ impl PianoGlobal {
     fn click_control(&mut self, f: usize, i: usize) {
         match f {
             0 => {
-                self.tracks.get_mut(i as usize).map(|n| n.hide = !n.hide);
+                self.tracks.get_mut(i as usize).map(|t| t.hide = !t.hide);
                 self.draw_all();
             }
             1 => {

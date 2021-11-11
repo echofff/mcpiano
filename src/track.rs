@@ -47,6 +47,28 @@ impl Track {
             .map(|(i, _)| i + 1)
             .unwrap_or(0)
     }
+    pub fn gn(&self, ti: usize) -> Option<&Note> {
+        self.get(ti >> 2)
+    }
+    pub fn gnb(&self, ti: usize) -> Option<(&Note, u8)> {
+        self.get(ti >> 2).map(|n| (n, ti.to_beat()))
+    }
+    pub fn gnb_mut(&mut self, ti: usize) -> Option<(&mut Note, u8)> {
+        self.get_mut(ti >> 2).map(|n| (n, ti.to_beat()))
+    }
+    pub fn gn_mut(&mut self, ti: usize) -> Option<&mut Note> {
+        self.get_mut(ti >> 2)
+    }
+}
+
+trait BeatIndex {
+    fn to_beat(&self) -> u8;
+}
+
+impl BeatIndex for usize {
+    fn to_beat(&self) -> u8 {
+        0b11 >> self & 0b11
+    }
 }
 
 impl Deref for Track {

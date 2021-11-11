@@ -33,13 +33,15 @@ pub struct RuntimeData {
 
     pub play_bt: usize,
 
-    pub notew: f64,
-    pub cellw: f64,
-    pub cellh: f64,
+    pub cube_w: f64,
+    pub cube_h: f64,
+    //pub cellw: f64,
+    //pub cellh: f64,
     pub borde: f64,
-    pub titlw: f64,
-    pub tablw: f64,
-    pub tablh: f64,
+    //pub titlw: f64,
+    pub titles: usize,
+    pub win_w: f64,
+    pub win_h: f64,
 }
 
 pub struct Theme {
@@ -91,13 +93,12 @@ impl RuntimeData {
             sel_inst: 11,
             maxnote: 20,
             pause: true,
-            notew: 20f64,
-            cellw: 80f64,
-            cellh: 20f64,
+            cube_w: 20f64,
+            cube_h: 20f64,
             borde: 1f64,
-            titlw: 80f64,
-            tablw: 1900f64,
-            tablh: 1000f64,
+            titles: 4,
+            win_w: 1900f64,
+            win_h: 1000f64,
 
             error_hl: Vec::new(),
             select_hl: Vec::new(),
