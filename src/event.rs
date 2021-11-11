@@ -68,8 +68,6 @@ impl PianoGlobal {
     fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let select = self.rtd.sel_inst;
 
-
-
         if let Some(n) = self
             .tracks
             .iter_mut()
@@ -112,20 +110,19 @@ impl PianoGlobal {
 
     fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let mut change = false;
-        self.tracks.iter_mut().map(|t| t.get_mut(ni)).for_each(|n| {
-            if let Some(n) = n {
-                if n.note == 24 - y as u8 {
-                    if (n.beat & beat) == beat && !shift {
-                        n.beat &= !beat;
-                        change = true;
-                    }
-                    if shift {
-                        change = n.beat != 0;
-                        n.beat = 0;
-                    }
+        self.tracks
+            .iter_mut()
+            .filter_map(|t| t.get_mut(ni))
+            .filter(|n| n.note == 24 - y as u8)
+            .for_each(|n| {
+                if shift {
+                    n.beat = 0;
+                    change = n.beat != 0;
+                } else {
+                    n.beat &= !beat;
+                    change = (n.beat & beat) == beat;
                 }
-            }
-        });
+            });
         if change {
             self.draw_all();
         }
