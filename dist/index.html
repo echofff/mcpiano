@@ -105,11 +105,15 @@
                 c.onmouseup = (e) => {
                     inp(e, 2)
                 }
+                window.ff=[]
                 window.onkeydown = (e) => {
                     if (e.keyCode == 32) {
                         g("play").onclick()
                         return false
                     } else if (pc.input_key(e.keyCode)) {
+                        //console.log(e)
+                        ff.push(e.keyCode)
+                        console.log(""+ff)
                         return true
                     } else {
                         return false
