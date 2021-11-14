@@ -1,3 +1,4 @@
+use std::ops::{Deref, DerefMut};
 
 use crate::*;
 use wasm_bindgen::prelude::*;
@@ -35,6 +36,20 @@ pub struct RuntimeData {
     pub titles: usize,
     pub win_w: f64,
     pub win_h: f64,
+}
+
+impl Deref for PianoGlobal {
+    type Target = RuntimeData;
+
+    fn deref(&self) -> &Self::Target {
+        &self.rt
+    }
+}
+
+impl DerefMut for PianoGlobal {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.rt
+    }
 }
 
 pub struct Theme {

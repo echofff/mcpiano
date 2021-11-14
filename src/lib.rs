@@ -54,7 +54,7 @@ pub struct PianoGlobal {
 
     tracks: Vec<Track>,
 
-    rtd: RuntimeData,
+    rt: RuntimeData,
 
     theme: Theme,
 }
@@ -79,7 +79,7 @@ impl PianoGlobal {
 
             tracks,
 
-            rtd: RuntimeData::new(),
+            rt: RuntimeData::new(),
             theme,
         };
 

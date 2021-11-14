@@ -8,8 +8,7 @@ use crate::map::*;
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn draw_all(&mut self) {
-        self.cctx
-            .clear_rect(0f64, 0f64, self.rtd.win_w, self.rtd.win_h);
+        self.cctx.clear_rect(0f64, 0f64, self.win_w, self.win_h);
 
         self.draw_insts();
         self.draw_backline();
@@ -21,7 +20,7 @@ impl PianoGlobal {
 
 impl PianoGlobal {
     fn draw_hover(&self) {
-        let (x, y) = self.rtd.pos;
+        let (x, y) = self.pos;
         self.cctx.set_fill_style(&self.theme.hover);
         self.draw_rect(x & !0b11, y, 4, 1, false);
         self.draw_rect(x, y, 1, 1, false);
@@ -30,36 +29,35 @@ impl PianoGlobal {
         self.tracks
             .iter()
             .enumerate()
-            .filter(|(_, t)| t.inst != self.rtd.sel_inst)
+            .filter(|(_, t)| t.inst != self.sel_inst)
             .for_each(|(i, t)| self.draw_track(t, i));
         self.tracks
             .iter()
             .enumerate()
-            .filter(|(_, t)| t.inst == self.rtd.sel_inst)
+            .filter(|(_, t)| t.inst == self.sel_inst)
             .for_each(|(i, t)| self.draw_track(t, i));
     }
 
     fn draw_insts(&self) {
         let c = &self.cctx;
         let theme = &self.theme;
-        let rt = &self.rtd;
 
         // draw control-pane and secquene-paneb background
         (0..self.tracks.len()).into_iter().for_each(|ti| {
             c.set_fill_style(&theme.track_row[ti % theme.track_row.len()]);
             //c.fill_rect(0f64, rt.cellh * ti as f64, rt.tablw, rt.cellh);
-            self.draw_rect(0, ti, 4 + self.rtd.maxnote * 4, 1, false);
+            self.draw_rect(0, ti, 4 + self.maxnote * 4, 1, false);
         });
 
         // draw edit-pane background
         (0..25).into_iter().for_each(|i| {
             c.set_fill_style(&theme.note_row[(24 - i) % theme.note_row.len()]);
             //c.fill_rect(0f64, y, rt.tablw, rt.cellh);
-            self.draw_rect(0, self.tracks.len() + i, 4 + self.rtd.maxnote * 4, 1, false);
+            self.draw_rect(0, self.tracks.len() + i, 4 + self.maxnote * 4, 1, false);
 
             c.set_fill_style(&"black".into());
-            let y = (self.tracks.len() + i) as f64 * rt.cube_h;
-            c.fill_text(TITLE[24 - i], 10f64, y + rt.cube_h * 0.6f64)
+            let y = (self.tracks.len() + i) as f64 * self.cube_h;
+            c.fill_text(TITLE[24 - i], 10f64, y + self.cube_h * 0.6f64)
                 .unwrap_throw();
         })
     }
@@ -72,18 +70,18 @@ impl PianoGlobal {
 
         // draw lighter line
         c.set_stroke_style(line[1]);
-        (0..self.rtd.maxnote * 4).into_iter().for_each(|i| {
-            let x = (i + 4) as f64 * self.rtd.cube_w;
+        (0..self.maxnote * 4).into_iter().for_each(|i| {
+            let x = (i + 4) as f64 * self.cube_w;
             c.move_to(x, 0f64);
-            c.line_to(x, self.rtd.win_h);
+            c.line_to(x, self.win_h);
         });
 
         // draw darker line
         c.set_stroke_style(line[0]);
-        (0..self.rtd.maxnote).into_iter().for_each(|i| {
-            let x = (i * 4 + 4) as f64 * self.rtd.cube_w;
+        (0..self.maxnote).into_iter().for_each(|i| {
+            let x = (i * 4 + 4) as f64 * self.cube_w;
             c.move_to(x, 0f64);
-            c.line_to(x, self.rtd.win_h);
+            c.line_to(x, self.win_h);
         });
 
         c.stroke();
@@ -93,7 +91,7 @@ impl PianoGlobal {
         let theme = &self.theme;
 
         // draw control part
-        let is_selected = self.rtd.sel_inst == t.inst;
+        let is_selected = self.sel_inst == t.inst;
 
         self.cctx.set_fill_style(&theme.control[t.hide as usize]);
         self.draw_rect(0, ti, 1, 1, true);
@@ -153,31 +151,30 @@ impl PianoGlobal {
     }
 
     fn draw_down_line(&self, x: usize, y: usize) {
-        let cv = &self.rtd;
         self.cctx.fill_rect(
-            (x * 4 + 4) as f64 * cv.cube_w + cv.borde,
-            y as f64 * cv.cube_h + 0.75f64 * cv.cube_h,
-            cv.cube_w * 4f64 - cv.borde * 2f64,
-            cv.cube_h * 0.25,
+            (x * 4 + 4) as f64 * self.cube_w + self.borde,
+            y as f64 * self.cube_h + 0.75f64 * self.cube_h,
+            self.cube_w * 4f64 - self.borde * 2f64,
+            self.cube_h * 0.25,
         );
     }
 
     fn draw_hightlight(&self) {
         self.cctx.set_fill_style(&self.theme.sel);
-        self.rtd.select_hl.iter().for_each(|(ni, beat)| {
+        self.select_hl.iter().for_each(|(ni, beat)| {
             self.draw_vert(*ni, *beat);
         });
         self.cctx.set_fill_style(&self.theme.error);
-        self.rtd.error_hl.iter().for_each(|(ni, beat)| {
+        self.error_hl.iter().for_each(|(ni, beat)| {
             self.draw_vert(*ni, *beat);
         });
 
         self.cctx.set_fill_style(&self.theme.play);
-        let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
+        let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
         self.draw_vert(ni, beat);
 
         self.cctx.set_fill_style(&self.theme.hover);
-        let (ni, beat) = ((self.rtd.pos.0 >> 2) - 1, 0b1000 >> (self.rtd.pos.0 & 0b11));
+        let (ni, beat) = ((self.pos.0 >> 2) - 1, 0b1000 >> (self.pos.0 & 0b11));
         self.draw_vert(ni, beat);
     }
 
@@ -193,12 +190,12 @@ impl PianoGlobal {
     }
 
     fn draw_rect(&self, x: usize, y: usize, w: usize, h: usize, border: bool) {
-        let b = if border { self.rtd.borde } else { 0f64 };
+        let b = if border { self.borde } else { 0f64 };
         self.cctx.fill_rect(
-            x as f64 * self.rtd.cube_w + b,
-            y as f64 * self.rtd.cube_h + b,
-            w as f64 * self.rtd.cube_w - b * 2f64,
-            h as f64 * self.rtd.cube_h - b * 2f64,
+            x as f64 * self.cube_w + b,
+            y as f64 * self.cube_h + b,
+            w as f64 * self.cube_w - b * 2f64,
+            h as f64 * self.cube_h - b * 2f64,
         );
     }
 }

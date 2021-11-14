@@ -15,9 +15,9 @@ impl PianoGlobal {
         ctrl: bool,
         _alt: bool,
     ) {
-        let (xi, yi) = (x / self.rtd.cube_w as usize, y / self.rtd.cube_h as usize);
+        let (xi, yi) = (x / self.cube_w as usize, y / self.cube_h as usize);
 
-        self.rtd.pos = if (xi, yi) == self.rtd.pos && cata == 1 {
+        self.pos = if (xi, yi) == self.pos && cata == 1 {
             return;
         } else {
             (xi, yi)
@@ -46,13 +46,13 @@ impl PianoGlobal {
     }
 
     pub fn input_key(&mut self, key: usize) -> bool {
-        let (x, _) = self.rtd.pos;
+        let (x, _) = self.pos;
         if let Some((i, _)) = KEYM.into_iter().enumerate().find(|(_, n)| *n == key) {
             if x > 4 {
                 let (ni, beat) = ((x - 4) >> 2, 0b1000 >> (x & 0b11));
                 self.click_edit(ni, beat, 24 - i, false);
             } else {
-                self.play(self.rtd.sel_inst as u8, i as u8);
+                self.play(self.sel_inst as u8, i as u8);
             }
             self.draw_all();
             return false;
@@ -84,7 +84,7 @@ impl PianoGlobal {
 
 impl PianoGlobal {
     fn click_time(&mut self, t: usize) {
-        self.rtd.play_bt = t;
+        self.play_bt = t;
     }
     fn click_control(&mut self, f: usize, i: usize) {
         match f {
@@ -103,18 +103,18 @@ impl PianoGlobal {
                 }
             }
             _ => {
-                self.rtd.sel_inst = self.tracks[i].inst;
+                self.sel_inst = self.tracks[i].inst;
                 //self.draw_all();
             }
         }
     }
     fn click_switch(&mut self, i: usize) {
-        self.rtd.sel_inst = self.tracks[i].inst;
+        self.sel_inst = self.tracks[i].inst;
         //self.draw_all();
     }
 
     fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
-        let select = self.rtd.sel_inst;
+        let select = self.sel_inst;
 
         if let Some(n) = self
             .tracks
@@ -153,7 +153,7 @@ impl PianoGlobal {
     }
 
     fn click_play(&mut self, ic: u8) {
-        self.play(self.rtd.sel_inst as u8, 24 - ic);
+        self.play(self.sel_inst as u8, 24 - ic);
     }
 
     fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {

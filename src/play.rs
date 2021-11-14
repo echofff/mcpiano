@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn set_volumn(&mut self, volumn: f32) {
-        self.rtd.volumn = volumn;
+        self.volumn = volumn;
     }
     pub fn play(&self, inst: u8, note: u8) {
         let a = self.actx.create_buffer_source().unwrap_throw();
@@ -13,7 +13,7 @@ impl PianoGlobal {
 
         a.set_buffer(self.sounds[inst as usize].audio.as_ref());
         a.detune().set_value((note as f32 - 12f32) * 100f32);
-        g.gain().set_value(self.rtd.volumn);
+        g.gain().set_value(self.volumn);
 
         a.connect_with_audio_node(&g).expect_throw("connect play");
         g.connect_with_audio_node(&self.actx.destination())
@@ -23,19 +23,19 @@ impl PianoGlobal {
     }
 
     pub fn play_start(&mut self) -> bool {
-        self.rtd.pause ^= true;
-        !self.rtd.pause
+        self.pause ^= true;
+        !self.pause
     }
 
     pub fn play_continue(&self) -> bool {
-        self.rtd.maxnote > self.rtd.play_bt >> 2
+        self.maxnote > self.play_bt >> 2
     }
 
     pub fn play_stage(&mut self) -> bool {
-        let (ni, beat) = (self.rtd.play_bt >> 2, 0b1000 >> (self.rtd.play_bt & 0b11));
+        let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
 
-        if self.rtd.maxnote > ni {
-            self.rtd.play_bt += 1;
+        if self.maxnote > ni {
+            self.play_bt += 1;
             self.draw_all();
             self.tracks
                 .iter()
@@ -46,8 +46,8 @@ impl PianoGlobal {
                 });
             true
         } else {
-            self.rtd.pause = true;
-            self.rtd.play_bt = 0;
+            self.pause = true;
+            self.play_bt = 0;
             self.draw_all();
             false
         }
