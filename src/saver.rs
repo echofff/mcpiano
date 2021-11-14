@@ -1,10 +1,18 @@
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Map};
+
 use crate::*;
 
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn save(&self) -> String {
-        match serde_json::to_string(&self.config) {
-            Ok(s) => s,
+        match serde_json::to_value(&self.tracks) {
+            Ok(v) => {
+                let mut map = Map::new();
+                map.insert(String::from("tracks"), v);
+                map.insert(String::from("version"), json!(2));
+                serde_json::Value::Object(map).to_string()
+            }
             Err(e) => {
                 format!("save failed {:?}", e)
             }
@@ -30,14 +38,9 @@ impl PianoGlobal {
 
     pub fn load(&mut self, json: String) {
         //serde_json::to_string(&self.config).unwrap_throw()
+
         match serde_json::from_str(json.as_str()) {
-            Ok(c) => {
-                self.config = c;
-                self.tracks
-                    .iter_mut()
-                    .for_each(|t| t.colo = t.colo_s.clone().into());
-                self.resize(-1)
-            }
+            Ok(SaveConf { tracks, .. }) => self.tracks = tracks,
             Err(e) => {
                 l(format!("load filed by {:?}", e));
             }
@@ -116,6 +119,14 @@ impl PianoGlobal {
             last -= 1;
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+struct SaveConf {
+    tracks: Vec<Track>,
+
+    #[serde(default)]
+    version: usize,
 }
 const NOTE: &[u8; 25] = b"ABCDEFGHIJKLMNOPQRSTUVWXY";
 const BEAT: &[u8; 16] = b"0123456789abcdef";

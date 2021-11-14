@@ -1,11 +1,7 @@
-use std::ops::Deref;
-use std::ops::DerefMut;
 
 use crate::*;
 use wasm_bindgen::prelude::*;
 use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
-
-use crate::track::*;
 
 #[derive(serde::Deserialize)]
 pub struct NoteBox {
@@ -14,12 +10,6 @@ pub struct NoteBox {
     //size: usize,
     #[serde(skip_deserializing)]
     pub audio: Option<AudioBuffer>,
-}
-
-#[derive(Clone, serde::Deserialize, serde::Serialize)]
-pub struct PianoConfig {
-    pub tracks: Vec<Track>,
-    //pub insts: Vec<usize>,
 }
 
 pub struct RuntimeData {
@@ -112,29 +102,6 @@ impl RuntimeData {
             select_hl: Vec::new(),
             play_bt: 0,
         }
-    }
-}
-
-impl PianoConfig {
-    pub fn new() -> PianoConfig {
-        let tracks = vec![Track::new()];
-        //let insts = vec![11];
-
-        PianoConfig { tracks }
-    }
-}
-
-impl Deref for PianoGlobal {
-    type Target = PianoConfig;
-
-    fn deref(&self) -> &Self::Target {
-        &self.config
-    }
-}
-
-impl DerefMut for PianoGlobal {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.config
     }
 }
 

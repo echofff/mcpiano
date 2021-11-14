@@ -52,7 +52,8 @@ pub struct PianoGlobal {
     canv: HtmlCanvasElement,
     sounds: Vec<NoteBox>,
 
-    config: PianoConfig,
+    tracks: Vec<Track>,
+
     rtd: RuntimeData,
 
     theme: Theme,
@@ -67,7 +68,7 @@ impl PianoGlobal {
 
         let (canv, cctx) = Self::scanvas();
 
-        let config = PianoConfig::new();
+        let tracks = vec![Track::new()];
 
         let theme = Theme::new();
         let mut p = PianoGlobal {
@@ -76,7 +77,8 @@ impl PianoGlobal {
             canv,
             sounds,
 
-            config,
+            tracks,
+
             rtd: RuntimeData::new(),
             theme,
         };
