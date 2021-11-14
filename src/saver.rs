@@ -16,9 +16,7 @@ impl PianoGlobal {
         let mut res = String::with_capacity(length);
 
         self.tracks.iter().for_each(|t| {
-            res.insert_str(res.len(), "Z00");
-            res.insert_str(res.len(), t.colo_s.as_str());
-            res.push(INST[t.inst as usize] as char);
+            res.insert_str(res.len(), "Z");
             t.iter().for_each(|n| {
                 res.push(NOTE[n.note as usize] as char);
                 res.push(BEAT[n.beat as usize] as char);
@@ -121,4 +119,3 @@ impl PianoGlobal {
 }
 const NOTE: &[u8; 25] = b"ABCDEFGHIJKLMNOPQRSTUVWXY";
 const BEAT: &[u8; 16] = b"0123456789abcdef";
-const INST: &[u8; 18] = b"ghijklmnopqrstuvwx";
