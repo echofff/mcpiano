@@ -1,4 +1,3 @@
-use crate::track::Track;
 use crate::PianoGlobal;
 
 use wasm_bindgen::prelude::*;
@@ -43,7 +42,7 @@ impl PianoGlobal {
         let theme = &self.theme;
 
         // draw control-pane and secquene-paneb background
-        (0..self.tracks.len()).into_iter().for_each(|ti| {
+        (0..self.sheet.tr_len()).into_iter().for_each(|ti| {
             c.set_fill_style(&theme.track_row[ti % theme.track_row.len()]);
             //c.fill_rect(0f64, rt.cellh * ti as f64, rt.tablw, rt.cellh);
             self.draw_rect(0, ti, 4 + self.maxnote * 4, 1, false);
@@ -53,10 +52,10 @@ impl PianoGlobal {
         (0..25).into_iter().for_each(|i| {
             c.set_fill_style(&theme.note_row[(24 - i) % theme.note_row.len()]);
             //c.fill_rect(0f64, y, rt.tablw, rt.cellh);
-            self.draw_rect(0, self.tracks.len() + i, 4 + self.maxnote * 4, 1, false);
+            self.draw_rect(0, self.sheet.tr_len() + i, 4 + self.maxnote * 4, 1, false);
 
             c.set_fill_style(&"black".into());
-            let y = (self.tracks.len() + i) as f64 * self.cube_h;
+            let y = (self.sheet.tr_len() + i) as f64 * self.cube_h;
             c.fill_text(TITLE[24 - i], 10f64, y + self.cube_h * 0.6f64)
                 .unwrap_throw();
         })
@@ -87,7 +86,7 @@ impl PianoGlobal {
         c.stroke();
     }
 
-    fn draw_track(&self, t: &Track, ti: usize) {
+    fn draw_track(&self , ti: usize) {
         let theme = &self.theme;
 
         // draw control part
@@ -185,7 +184,7 @@ impl PianoGlobal {
             .zip(BEATS.into_iter())
             .filter(|(_, b)| b & beat != 0)
             .for_each(|(ni, _)| {
-                self.draw_rect(ni, 0, 1, self.tracks.len() + 25, false);
+                self.draw_rect(ni, 0, 1, self.sheet.tr_len() + 25, false);
             });
     }
 

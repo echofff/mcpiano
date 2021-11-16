@@ -7,6 +7,7 @@ mod map;
 mod pianoglobal;
 mod play;
 mod saver;
+mod sheet;
 mod track;
 use pianoglobal::*;
 
@@ -45,6 +46,10 @@ pub fn l(s: String) {
     }
 }
 
+use sheet::Sheet;
+
+use crate::sheet::RedPianoV2;
+
 #[wasm_bindgen]
 pub struct PianoGlobal {
     actx: AudioContext,
@@ -52,7 +57,8 @@ pub struct PianoGlobal {
     canv: HtmlCanvasElement,
     sounds: Vec<NoteBox>,
 
-    tracks: Vec<Track>,
+    //tracks: Vec<Track>,
+    sheet: Box<dyn Sheet>,
 
     rt: RuntimeData,
 
@@ -71,14 +77,17 @@ impl PianoGlobal {
         let tracks = vec![Track::new()];
 
         let theme = Theme::new();
+
+        let sheet = Box::new(RedPianoV2::new());
+
         let mut p = PianoGlobal {
             actx,
             cctx,
             canv,
             sounds,
+            sheet,
 
-            tracks,
-
+            //tracks,
             rt: RuntimeData::new(),
             theme,
         };
