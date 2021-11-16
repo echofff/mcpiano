@@ -2,6 +2,9 @@ use std::ops::{Deref, DerefMut};
 
 use wasm_bindgen::JsValue;
 
+use crate::event::Action;
+use crate::draw::Area;
+
 use super::Sheet;
 
 pub struct RedPianoV2 {
@@ -21,9 +24,26 @@ impl Sheet for RedPianoV2 {
         self.tracks.len()
     }
 
-    fn colo(&self,n: usize) -> usize {
-        &self.tracks.
+    fn colo(&self, n: usize) -> usize {
+        3usize
     }
+
+    fn click(&self, x: usize, y: usize, area: Area, act: Action) {}
+
+    fn save(&self) -> String {
+        String::from("TODO")
+    }
+    fn load(&mut self, str: String) {}
+
+    fn save_comp(&self) -> String {
+        String::from("TODO")
+    }
+
+    fn add_inst(&self, inst: usize, color_s: String) {}
+
+    fn resize(&self, tar: usize) {}
+
+    fn shunk(&mut self) {}
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize, Default)]

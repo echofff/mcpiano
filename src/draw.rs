@@ -12,7 +12,7 @@ impl PianoGlobal {
         self.draw_insts();
         self.draw_backline();
         self.draw_hightlight();
-        self.draw_tracks();
+        //self.draw_tracks();
         self.draw_hover();
     }
 }
@@ -24,18 +24,18 @@ impl PianoGlobal {
         self.draw_rect(x & !0b11, y, 4, 1, false);
         self.draw_rect(x, y, 1, 1, false);
     }
-    fn draw_tracks(&self) {
-        self.tracks
-            .iter()
-            .enumerate()
-            .filter(|(_, t)| t.inst != self.sel_inst)
-            .for_each(|(i, t)| self.draw_track(t, i));
-        self.tracks
-            .iter()
-            .enumerate()
-            .filter(|(_, t)| t.inst == self.sel_inst)
-            .for_each(|(i, t)| self.draw_track(t, i));
-    }
+//    fn draw_tracks(&self) {
+//        self.tracks
+//            .iter()
+//            .enumerate()
+//            .filter(|(_, t)| t.inst != self.sel_inst)
+//            .for_each(|(i, t)| self.draw_track(t, i));
+//        self.tracks
+//            .iter()
+//            .enumerate()
+//            .filter(|(_, t)| t.inst == self.sel_inst)
+//            .for_each(|(i, t)| self.draw_track(t, i));
+//    }
 
     fn draw_insts(&self) {
         let c = &self.cctx;
@@ -90,38 +90,38 @@ impl PianoGlobal {
         let theme = &self.theme;
 
         // draw control part
-        let is_selected = self.sel_inst == t.inst;
+        //let is_selected = self.sel_inst == t.inst;
 
-        self.cctx.set_fill_style(&theme.control[t.hide as usize]);
-        self.draw_rect(0, ti, 1, 1, true);
-        //self.draw_beat(&area, 0, ti, 0b1000);
+        //self.cctx.set_fill_style(&theme.control[t.hide as usize]);
+        //self.draw_rect(0, ti, 1, 1, true);
+        ////self.draw_beat(&area, 0, ti, 0b1000);
 
-        self.cctx.set_fill_style(&theme.control[2]);
-        self.draw_rect(1, ti, 1, 1, true);
-        //self.draw_beat(&area, 0, ti, 0b0100);
+        //self.cctx.set_fill_style(&theme.control[2]);
+        //self.draw_rect(1, ti, 1, 1, true);
+        ////self.draw_beat(&area, 0, ti, 0b0100);
 
-        self.cctx
-            .set_fill_style(&theme.control[3 + is_selected as usize]);
-        self.draw_rect(2, ti, 1, 1, true);
-        //self.draw_beat(&area, 0, ti, 0b0010);
+        //self.cctx
+        //    .set_fill_style(&theme.control[3 + is_selected as usize]);
+        //self.draw_rect(2, ti, 1, 1, true);
+        ////self.draw_beat(&area, 0, ti, 0b0010);
 
-        self.cctx.set_fill_style(&t.colo);
-        self.draw_rect(3, ti, 1, 1, true);
-        //self.draw_beat(&area, 0, ti, 0b0001);
+        //self.cctx.set_fill_style(&t.colo);
+        //self.draw_rect(3, ti, 1, 1, true);
+        ////self.draw_beat(&area, 0, ti, 0b0001);
 
-        t.notes
-            .iter()
-            .enumerate()
-            .filter(|(_, n)| n.beat != 0)
-            .for_each(|(ni, n)| {
-                // draw under line for every note that is not empty.
-                self.draw_down_line(ni, ti);
-                self.draw_beat(&Area::TrackSecquence, ni, ti, n.beat);
+        //t.notes
+        //    .iter()
+        //    .enumerate()
+        //    .filter(|(_, n)| n.beat != 0)
+        //    .for_each(|(ni, n)| {
+        //        // draw under line for every note that is not empty.
+        //        self.draw_down_line(ni, ti);
+        //        self.draw_beat(&Area::TrackSecquence, ni, ti, n.beat);
 
-                if !t.hide {
-                    self.draw_beat(&Area::EditPlane, ni, 24 - n.note as usize, n.beat);
-                }
-            });
+        //        if !t.hide {
+        //            self.draw_beat(&Area::EditPlane, ni, 24 - n.note as usize, n.beat);
+        //        }
+        //    });
     }
 
     fn draw_beat(&self, area: &Area, x: usize, y: usize, beat: u8) {
@@ -129,8 +129,8 @@ impl PianoGlobal {
         let (x, y) = match area {
             Area::TrackControl => (x, y),
             Area::TrackSecquence => (x * 4 + 4, y),
-            Area::EditPlane => (x * 4 + 4, y + self.tracks.len()),
-            Area::InstTitle => (x * 4, y + self.tracks.len()),
+            Area::EditPlane => (x * 4 + 4, y + self.sheet.tr_len()),
+            Area::InstTitle => (x * 4, y + self.sheet.tr_len()),
         };
         //let cv = &self.rtd;
 

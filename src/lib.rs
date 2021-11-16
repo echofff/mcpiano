@@ -74,7 +74,7 @@ impl PianoGlobal {
 
         let (canv, cctx) = Self::scanvas();
 
-        let tracks = vec![Track::new()];
+        //let tracks = vec![Track::new()];
 
         let theme = Theme::new();
 

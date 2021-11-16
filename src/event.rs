@@ -23,7 +23,7 @@ impl PianoGlobal {
             (xi, yi)
         };
 
-        let ts = self.tracks.len();
+        let ts = self.sheet.tr_len();
         let (area, xi, yi) = match (xi >= 4, yi >= ts) {
             (true, true) => (Area::EditPlane, xi - 4, yi - ts),
             (true, false) => (Area::TrackSecquence, xi - 4, yi),
@@ -58,24 +58,24 @@ impl PianoGlobal {
             return false;
         }
 
-        match key {
-            38 => self
-                .tracks
-                .iter_mut()
-                .filter(|t| !t.hide)
-                .filter_map(|t| t.get_mut((x - 4) >> 2))
-                .filter(|n| n.note < 24)
-                .for_each(|n| n.note += 1),
-            40 => self
-                .tracks
-                .iter_mut()
-                .filter(|t| !t.hide)
-                .filter_map(|t| t.get_mut((x - 4) >> 2))
-                .filter(|n| n.note > 0)
-                .for_each(|n| n.note -= 1),
+        //match key {
+        //    38 => self
+        //        .tracks
+        //        .iter_mut()
+        //        .filter(|t| !t.hide)
+        //        .filter_map(|t| t.get_mut((x - 4) >> 2))
+        //        .filter(|n| n.note < 24)
+        //        .for_each(|n| n.note += 1),
+        //    40 => self
+        //        .tracks
+        //        .iter_mut()
+        //        .filter(|t| !t.hide)
+        //        .filter_map(|t| t.get_mut((x - 4) >> 2))
+        //        .filter(|n| n.note > 0)
+        //        .for_each(|n| n.note -= 1),
 
-            _ => return true,
-        }
+        //    _ => return true,
+        //}
 
         self.draw_all();
         false
@@ -87,69 +87,71 @@ impl PianoGlobal {
         self.play_bt = t;
     }
     fn click_control(&mut self, f: usize, i: usize) {
-        match f {
-            0 => {
-                self.tracks.get_mut(i as usize).map(|t| t.hide = !t.hide);
-                //self.draw_all();
-            }
-            1 => {
-                if let Some(true) = self
-                    .tracks
-                    .get(i as usize)
-                    .map(|t| t.deleteable() && t.len() > 1)
-                {
-                    self.tracks.remove(i as usize);
-                    self.resize(-1);
-                }
-            }
-            _ => {
-                self.sel_inst = self.tracks[i].inst;
-                //self.draw_all();
-            }
-        }
+
+      //  self.sheet.click(i)
+      //  match f {
+      //      0 => {
+      //          self.tracks.get_mut(i as usize).map(|t| t.hide = !t.hide);
+      //          //self.draw_all();
+      //      }
+      //      1 => {
+      //          if let Some(true) = self
+      //              .tracks
+      //              .get(i as usize)
+      //              .map(|t| t.deleteable() && t.len() > 1)
+      //          {
+      //              self.tracks.remove(i as usize);
+      //              self.resize(-1);
+      //          }
+      //      }
+      //      _ => {
+      //          self.sel_inst = self.tracks[i].inst;
+      //          //self.draw_all();
+      //      }
+      //  }
     }
     fn click_switch(&mut self, i: usize) {
-        self.sel_inst = self.tracks[i].inst;
+        //self.sel_inst = self.tracks[i].inst;
         //self.draw_all();
     }
 
     fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
         let select = self.sel_inst;
 
-        if let Some(n) = self
-            .tracks
-            .iter_mut()
-            .filter(|t| t.inst == select)
-            .filter_map(|t| t.get_mut(ni))
-            .find(|n| n.note == 24 - y as u8)
-        {
-            if n.beat & beat == 0 {
-                if !shift {
-                    n.beat |= beat;
-                } else {
-                    n.beat = 0b1111;
-                }
-                //self.draw_all();
-                self.play(select as u8, 24 - y as u8);
-            }
-        } else if let Some(n) = self
-            .tracks
-            .iter_mut()
-            .filter(|t| t.inst == select)
-            .filter_map(|t| t.get_mut(ni))
-            .find(|n| n.beat == 0)
-        {
-            n.note = 24 - y as u8;
-            if n.beat & beat == 0 {
-                if !shift {
-                    n.beat |= beat;
-                } else {
-                    n.beat = 0b1111;
-                }
-                //self.draw_all();
-                self.play(select as u8, 24 - y as u8);
-            }
-        }
+      //  if let Some(n) = self
+      //      .tracks
+      //      .iter_mut()
+      //      .filter(|t| t.inst == select)
+      //      .filter_map(|t| t.get_mut(ni))
+      //      .find(|n| n.note == 24 - y as u8)
+      //  {
+      //      if n.beat & beat == 0 {
+      //          if !shift {
+      //              n.beat |= beat;
+      //          } else {
+      //              n.beat = 0b1111;
+      //          }
+      //          //self.draw_all();
+      //          self.play(select as u8, 24 - y as u8);
+      //      }
+      //  } else if let Some(n) = self
+      //      .tracks
+      //      .iter_mut()
+      //      .filter(|t| t.inst == select)
+      //      .filter_map(|t| t.get_mut(ni))
+      //      .find(|n| n.beat == 0)
+      //  {
+      //      n.note = 24 - y as u8;
+      //      if n.beat & beat == 0 {
+      //          if !shift {
+      //              n.beat |= beat;
+      //          } else {
+      //              n.beat = 0b1111;
+      //          }
+      //          //self.draw_all();
+      //          self.play(select as u8, 24 - y as u8);
+      //      }
+      //  }
     }
 
     fn click_play(&mut self, ic: u8) {
@@ -157,23 +159,23 @@ impl PianoGlobal {
     }
 
     fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
-        let mut change = false;
-        self.tracks
-            .iter_mut()
-            .filter_map(|t| t.get_mut(ni))
-            .filter(|n| n.note == 24 - y as u8)
-            .for_each(|n| {
-                if shift {
-                    n.beat = 0;
-                    change = n.beat != 0;
-                } else {
-                    n.beat &= !beat;
-                    change = (n.beat & beat) == beat;
-                }
-            });
-        if change {
-            //self.draw_all();
-        }
+      //  let mut change = false;
+      //  self.tracks
+      //      .iter_mut()
+      //      .filter_map(|t| t.get_mut(ni))
+      //      .filter(|n| n.note == 24 - y as u8)
+      //      .for_each(|n| {
+      //          if shift {
+      //              n.beat = 0;
+      //              change = n.beat != 0;
+      //          } else {
+      //              n.beat &= !beat;
+      //              change = (n.beat & beat) == beat;
+      //          }
+      //      });
+      //  if change {
+      //      //self.draw_all();
+      //  }
     }
 }
 
@@ -181,3 +183,9 @@ const KEYM: [usize; 25] = [
     192, 9, 49, 81, 50, 87, 69, 52, 82, 53, 84, 89, 55, 85, 56, 73, 57, 79, 80, 173, 219, 61, 221,
     220, 8,
 ];
+
+pub enum Action{
+    Set,
+    Reset,
+    Delete,
+}
