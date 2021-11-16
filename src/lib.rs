@@ -80,7 +80,7 @@ impl PianoGlobal {
 
         let sheet = Box::new(RedPianoV2::new());
 
-        let mut p = PianoGlobal {
+        PianoGlobal {
             actx,
             cctx,
             canv,
@@ -90,10 +90,7 @@ impl PianoGlobal {
             //tracks,
             rt: RuntimeData::new(),
             theme,
-        };
-
-        p.resize(-1);
-        p
+        }
     }
 }
 

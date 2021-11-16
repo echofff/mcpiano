@@ -2,8 +2,8 @@ use std::ops::{Deref, DerefMut};
 
 use wasm_bindgen::JsValue;
 
-use crate::event::Action;
 use crate::draw::Area;
+use crate::event::Action;
 
 use super::Sheet;
 
@@ -41,9 +41,40 @@ impl Sheet for RedPianoV2 {
 
     fn add_inst(&self, inst: usize, color_s: String) {}
 
-    fn resize(&self, tar: usize) {}
+    fn resize(&mut self, tar: usize) -> usize {
+        let tar = self
+            .tracks
+            .iter()
+            .map(|a| a.true_len())
+            .max()
+            .unwrap_or(0)
+            .max(tar);
 
-    fn shunk(&mut self) {}
+        self.tracks
+            .iter_mut()
+            .for_each(|t| t.resize(tar, Default::default()));
+
+        self.tracks.len() * 4
+    }
+
+    //fn shunk(&mut self) {
+    //    while self.tracks.iter().all(|t| {
+    //        if let Some(Note { beat: 0, .. }) = t.get(last) {
+    //            true && t.len() > self.maxnote
+    //        } else {
+    //            false
+    //        }
+    //    }) {
+    //        self.tracks.iter_mut().for_each(|t| {
+    //            t.pop();
+    //        });
+    //        last -= 1;
+    //    }
+    //}
+
+    fn time(&self) -> usize {
+        self.tracks.iter().map(|t| t.len()).max().unwrap_or(1) * 4
+    }
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize, Default)]

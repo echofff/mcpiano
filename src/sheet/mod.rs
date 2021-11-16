@@ -15,9 +15,10 @@ pub trait Sheet {
 
     fn add_inst(&self, inst: usize, color_s: String);
 
-    fn resize(&self, tar: usize);
+    fn resize(&mut self, tar: usize) -> usize;
+    fn time(&self) -> usize;
 
-    fn shunk(&mut self);
+    //fn shunk(&mut self);
 }
 
 pub use redpianov2::RedPianoV2;

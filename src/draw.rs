@@ -11,13 +11,18 @@ impl PianoGlobal {
 
         self.draw_insts();
         self.draw_backline();
+
         self.draw_hightlight();
+
         //self.draw_tracks();
+
         self.draw_hover();
     }
 }
 
 impl PianoGlobal {
+
+
     fn draw_hover(&self) {
         let (x, y) = self.pos;
         self.cctx.set_fill_style(&self.theme.hover);
