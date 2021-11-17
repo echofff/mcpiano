@@ -2,11 +2,9 @@ use std::ops::{Deref, DerefMut};
 
 use crate::*;
 use wasm_bindgen::prelude::*;
-use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
 
 #[wasm_bindgen]
 pub struct PianoGlobal {
-
     #[wasm_bindgen(skip)]
     pub actx: Player,
     //tracks: Vec<Track>,

@@ -8,21 +8,12 @@ mod pianoglobal;
 mod play;
 mod saver;
 mod sheet;
-mod track;
 use draw::Draw;
 use pianoglobal::*;
 
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-use web_sys::CanvasRenderingContext2d;
-use web_sys::HtmlCanvasElement;
 
 use play::Player;
-
-//use wee_alloc;
-//#[cfg(feature = "wee_alloc")]
-//#[global_allocator]
-//
 
 extern crate wee_alloc;
 
@@ -53,18 +44,7 @@ impl PianoGlobal {
     pub async fn new() -> PianoGlobal {
         let actx = Player::new().await;
 
-        let (canv, cctx) = Self::scanvas();
-
-        let cctx = Draw {
-            cctx,
-            canv,
-            cube_w: 20f64,
-            cube_h: 20f64,
-            borde: 1f64,
-            titles: 4,
-            win_w: 1900f64,
-            win_h: 1000f64,
-        };
+        let cctx = Draw::new();
 
         let theme = Theme::new();
 
@@ -82,22 +62,4 @@ impl PianoGlobal {
     }
 }
 
-impl PianoGlobal {
-    fn scanvas() -> (HtmlCanvasElement, CanvasRenderingContext2d) {
-        let document = web_sys::window().unwrap().document().unwrap();
-        let canvas = document.get_element_by_id("canvas").unwrap();
-        let canvas: web_sys::HtmlCanvasElement = canvas
-            .dyn_into::<web_sys::HtmlCanvasElement>()
-            .map_err(|_| ())
-            .unwrap();
-
-        let context = canvas
-            .get_context("2d")
-            .unwrap()
-            .unwrap()
-            .dyn_into::<web_sys::CanvasRenderingContext2d>()
-            .unwrap();
-
-        (canvas, context)
-    }
-}
+impl PianoGlobal {}

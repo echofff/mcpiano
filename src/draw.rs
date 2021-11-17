@@ -1,6 +1,6 @@
 use crate::{pianoglobal::Theme, PianoGlobal};
 
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, JsCast};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use crate::map::*;
@@ -11,16 +11,45 @@ pub struct Draw {
 
     pub cube_w: f64,
     pub cube_h: f64,
-    //pub cellw: f64,
-    //pub cellh: f64,
-    pub borde: f64,
-    //pub titlw: f64,
+
     pub titles: usize,
+
+    pub borde: f64,
     pub win_w: f64,
     pub win_h: f64,
 }
 
 impl Draw {
+    pub fn new() -> Draw {
+        let (canv, cctx) = Self::scanvas();
+        Draw {
+            cctx,
+            canv,
+            cube_w: 20f64,
+            cube_h: 20f64,
+            borde: 1f64,
+            titles: 4,
+            win_w: 1900f64,
+            win_h: 1000f64,
+        }
+    }
+    fn scanvas() -> (HtmlCanvasElement, CanvasRenderingContext2d) {
+        let document = web_sys::window().unwrap().document().unwrap();
+        let canvas = document.get_element_by_id("canvas").unwrap();
+        let canvas: web_sys::HtmlCanvasElement = canvas
+            .dyn_into::<web_sys::HtmlCanvasElement>()
+            .map_err(|_| ())
+            .unwrap();
+
+        let context = canvas
+            .get_context("2d")
+            .unwrap()
+            .unwrap()
+            .dyn_into::<web_sys::CanvasRenderingContext2d>()
+            .unwrap();
+
+        (canvas, context)
+    }
     pub fn resize(&mut self, l: usize, h: usize) {
         self.win_w = l as f64 * self.cube_w;
         self.win_h = h as f64 * self.cube_h;
