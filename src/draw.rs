@@ -28,10 +28,10 @@ impl Draw {
         self.canv.set_width(self.win_w as u32);
         self.canv.set_height(self.win_h as u32);
     }
-    fn clear(&self) {
+    pub fn clear(&self) {
         self.cctx.clear_rect(0f64, 0f64, self.win_w, self.win_h);
     }
-    fn rect(&self, x: usize, y: usize, w: usize, h: usize, border: bool) {
+    pub fn rect(&self, x: usize, y: usize, w: usize, h: usize, border: bool) {
         let b = if border { self.borde } else { 0f64 };
         self.cctx.fill_rect(
             x as f64 * self.cube_w + b,
@@ -41,11 +41,11 @@ impl Draw {
         );
     }
 
-    fn style_fill(&self, col: &str) {
+    pub fn style_fill(&self, col: &str) {
         self.cctx.set_fill_style(&col.into());
     }
 
-    fn vert(&self, ni: usize, beat: u8, len: usize) {
+    pub fn vert(&self, ni: usize, beat: u8, len: usize) {
         let ni = ni * 4 + 4;
         (ni..ni + 4)
             .into_iter()
@@ -56,7 +56,7 @@ impl Draw {
             });
     }
 
-    fn down_line(&self, x: usize, y: usize) {
+    pub fn down_line(&self, x: usize, y: usize) {
         self.cctx.fill_rect(
             (x * 4 + 4) as f64 * self.cube_w + self.borde,
             y as f64 * self.cube_h + 0.75f64 * self.cube_h,
@@ -64,7 +64,7 @@ impl Draw {
             self.cube_h * 0.25,
         );
     }
-    fn backline(&self, len: usize) {
+    pub fn backline(&self, len: usize) {
         let c = &self.cctx;
         let line = [&"#666666".into(), &"#cccccc".into()];
 
@@ -89,7 +89,7 @@ impl Draw {
         c.stroke();
     }
 
-    fn draw_insts(&self, theme: &Theme, trs: usize, time: usize) {
+    pub fn draw_insts(&self, theme: &Theme, trs: usize, time: usize) {
         let c = &self.cctx;
 
         // draw control-pane and secquene-paneb background
@@ -129,7 +129,7 @@ impl PianoGlobal {
 
         self.draw_hightlight();
 
-        //self.draw_tracks();
+        self.draw_tracks();
 
         self.draw_hover();
     }
@@ -144,31 +144,6 @@ impl PianoGlobal {
     }
     fn draw_tracks(&self) {
         self.sheet.draw(&self.cctx);
-    }
-
-    fn draw_beat(&self, area: &Area, x: usize, y: usize, beat: u8) {
-        // use different offset for different areas.
-        let (x, y) = match area {
-            Area::TrackControl => (x, y),
-            Area::TrackSecquence => (x * 4 + 4, y),
-            Area::EditPlane => (x * 4 + 4, y + self.sheet.tr_len()),
-            Area::InstTitle => (x * 4, y + self.sheet.tr_len()),
-        };
-        //let cv = &self.rtd;
-
-        //let y = y as f64 * cv.cellh + cv.borde;
-        //let w = cv.notew - cv.borde * 2f64;
-        //let h = cv.cellh - cv.borde * 4f64;
-
-        (x..x + 4)
-            .into_iter()
-            .zip(BEATS.into_iter())
-            .filter(|(_, b)| b & beat != 0)
-            .for_each(|(x, _)| {
-                //let x = x as f64 * cv.notew + cv.borde;
-                //self.cctx.fill_rect(x, y, w, h);
-                self.cctx.rect(x, y, 1, 1, true);
-            })
     }
 
     fn draw_hightlight(&self) {

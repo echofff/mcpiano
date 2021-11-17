@@ -4,7 +4,7 @@ use std::process::Command;
 use wasm_bindgen::JsValue;
 
 use crate::draw::{Area, Draw};
-use crate::event::{self, Action, Event};
+use crate::event::{self, Action, Event, Key, KeyCata};
 
 use super::{CommonData, Sheet};
 
@@ -85,26 +85,28 @@ impl Sheet for RedPianoV2 {
         match event {
             Event {
                 area: Area::EditPlane,
-                xi,
+                cata: KeyCata::Down | KeyCata::Move,
+                key: Key::Left,
                 yi,
-                shift,
+                ctrl,
                 ..
-            } => self.click_edit(ni, beat, yi, shift),
+            } => self.click_edit(ni, beat, yi, ctrl),
             _ => {}
         }
     }
 
     fn draw(&self, c: &Draw) {
+        let l = self.tr_len();
         self.tracks
             .iter()
             .enumerate()
             .filter(|(_, t)| t.inst != self.sel_inst)
-            .for_each(|(i, t)| t.draw_track(i, c));
+            .for_each(|(i, t)| t.draw_track(c, i, l));
         self.tracks
             .iter()
             .enumerate()
             .filter(|(_, t)| t.inst == self.sel_inst)
-            .for_each(|(i, t)| t.draw_track(i, c));
+            .for_each(|(i, t)| t.draw_track(c, i, l));
     }
 }
 
@@ -141,7 +143,7 @@ impl RedPianoV2 {
         //self.draw_all();
     }
 
-    fn click_edit(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
+    fn click_edit(&mut self, ni: usize, beat: u8, y: usize, ctrl: bool) {
         //let select = self.sel_inst;
 
         if let Some(n) = self
@@ -151,8 +153,9 @@ impl RedPianoV2 {
             .filter_map(|t| t.get_mut(ni))
             .find(|n| n.note == 24 - y as u8)
         {
+            //crate::l(format!("--{}--{}--{}--{}--{}",ni,beat,y,shift,n.beat));
             if n.beat & beat == 0 {
-                if !shift {
+                if !ctrl {
                     n.beat |= beat;
                 } else {
                     n.beat = 0b1111;
@@ -169,7 +172,7 @@ impl RedPianoV2 {
         {
             n.note = 24 - y as u8;
             if n.beat & beat == 0 {
-                if !shift {
+                if !ctrl {
                     n.beat |= beat;
                 } else {
                     n.beat = 0b1111;
@@ -263,7 +266,7 @@ impl Track {
         self.get_mut(ti >> 2)
     }
 
-    fn draw_track(&self, i: usize, c: &Draw) {
+    fn draw_track(&self, c: &Draw, i: usize, l: usize) {
         //let theme = &self.theme;
 
         //draw control part
@@ -286,19 +289,47 @@ impl Track {
         //self.draw_rect(3, ti, 1, 1, true);
         ////self.draw_beat(&area, 0, ti, 0b0001);
 
-        //t.notes
-        //    .iter()
-        //    .enumerate()
-        //    .filter(|(_, n)| n.beat != 0)
-        //    .for_each(|(ni, n)| {
-        //        // draw under line for every note that is not empty.
-        //        self.draw_down_line(ni, ti);
-        //        self.draw_beat(&Area::TrackSecquence, ni, ti, n.beat);
+        self.notes
+            .iter()
+            .enumerate()
+            .filter(|(_, n)| n.beat != 0)
+            .for_each(|(ni, n)| {
+                // draw under line for every note that is not empty.
+                c.down_line(ni, i);
 
-        //        if !t.hide {
-        //            self.draw_beat(&Area::EditPlane, ni, 24 - n.note as usize, n.beat);
-        //        }
-        //    });
+                n.draw_beat(c, ni * 4 + c.titles, i);
+
+                if !self.hide {
+                    n.draw_beat(c, ni * 4 + c.titles, 24 - n.note as usize + l);
+                }
+            });
+    }
+}
+
+impl Note {
+    pub fn draw_beat(&self, c: &Draw, x: usize, y: usize) {
+        // use different offset for different areas.
+        //let (x, y) = match area {
+        //    Area::TrackControl => (x, y),
+        //    Area::TrackSecquence => (x * 4 + 4, y),
+        //    Area::EditPlane => (x * 4 + 4, y + self.sheet.tr_len()),
+        //    Area::InstTitle => (x * 4, y + self.sheet.tr_len()),
+        //};
+        //let cv = &self.rtd;
+
+        //let y = y as f64 * cv.cellh + cv.borde;
+        //let w = cv.notew - cv.borde * 2f64;
+        //let h = cv.cellh - cv.borde * 4f64;
+
+        (x..x + 4)
+            .into_iter()
+            .zip([0b1000, 0b0100, 0b0010, 0b0001].into_iter())
+            .filter(|(_, b)| b & self.beat != 0)
+            .for_each(|(x, _)| {
+                //let x = x as f64 * cv.notew + cv.borde;
+                //self.cctx.fill_rect(x, y, w, h);
+                c.rect(x, y, 1, 1, true);
+            })
     }
 }
 

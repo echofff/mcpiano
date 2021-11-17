@@ -26,7 +26,6 @@ pub struct RuntimeData {
     pub select_hl: Vec<(usize, u8)>,
 
     pub play_bt: usize,
-
 }
 
 impl Deref for PianoGlobal {

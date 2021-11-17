@@ -4,6 +4,7 @@ use crate::draw::Area;
 use wasm_bindgen::prelude::*;
 
 pub enum Key {
+    Empty,
     Left,
     Right,
     Mid,
@@ -59,7 +60,7 @@ impl PianoGlobal {
         //let (ni, beat) = (xi >> 2, 0b1000 >> (xi & 0b11) as u8);
 
         let cata = &[KeyCata::Down, KeyCata::Move, KeyCata::Up][cata as usize];
-        let key = &[Key::Left, Key::Mid, Key::Right][key as usize];
+        let key = &[Key::Empty, Key::Left, Key::Mid, Key::Right][key as usize];
         self.sheet.click(Event {
             xi,
             yi,

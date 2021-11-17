@@ -84,8 +84,7 @@ impl PianoGlobal {
         let width = self.cctx.cube_w * l as f64;
         let height = self.cctx.cube_h * h as f64;
 
-        self.cctx.resize(l,h);
-
+        self.cctx.resize(l, h);
 
         self.draw_all();
         //alert("asdfasdf");
