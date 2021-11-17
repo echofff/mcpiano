@@ -60,7 +60,7 @@ impl PianoGlobal {
         //let (ni, beat) = (xi >> 2, 0b1000 >> (xi & 0b11) as u8);
 
         let cata = &[KeyCata::Down, KeyCata::Move, KeyCata::Up][cata as usize];
-        let key = &[Key::Empty, Key::Left, Key::Mid, Key::Right][key as usize];
+        let key = &[Key::Empty, Key::Left, Key::Right, Key::Empty, Key::Mid][key as usize];
         self.sheet.click(Event {
             xi,
             yi,

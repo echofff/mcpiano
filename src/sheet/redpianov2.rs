@@ -91,6 +91,14 @@ impl Sheet for RedPianoV2 {
                 ctrl,
                 ..
             } => self.click_edit(ni, beat, yi, ctrl),
+            Event {
+                area: Area::EditPlane,
+                cata: KeyCata::Down | KeyCata::Move,
+                key: Key::Right,
+                yi,
+                ctrl,
+                ..
+            } => self.click_del(ni, beat, yi, ctrl),
             _ => {}
         }
     }
@@ -187,24 +195,21 @@ impl RedPianoV2 {
         //self.play(self.sel_inst as u8, 24 - ic);
     }
 
-    fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
-        //  let mut change = false;
-        //  self.tracks
-        //      .iter_mut()
-        //      .filter_map(|t| t.get_mut(ni))
-        //      .filter(|n| n.note == 24 - y as u8)
-        //      .for_each(|n| {
-        //          if shift {
-        //              n.beat = 0;
-        //              change = n.beat != 0;
-        //          } else {
-        //              n.beat &= !beat;
-        //              change = (n.beat & beat) == beat;
-        //          }
-        //      });
-        //  if change {
-        //      //self.draw_all();
-        //  }
+    fn click_del(&mut self, ni: usize, beat: u8, y: usize, ctrl: bool) {
+        let mut change = false;
+        self.tracks
+            .iter_mut()
+            .filter_map(|t| t.get_mut(ni))
+            .filter(|n| n.note == 24 - y as u8)
+            .for_each(|n| {
+                if ctrl {
+                    n.beat = 0;
+                    change = n.beat != 0;
+                } else {
+                    n.beat &= !beat;
+                    change = (n.beat & beat) == beat;
+                }
+            });
     }
 }
 
