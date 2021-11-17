@@ -5,6 +5,7 @@ use wasm_bindgen::JsValue;
 
 use crate::draw::{Area, Draw};
 use crate::event::{self, Action, Event, Key, KeyCata};
+use crate::play::Player;
 
 use super::{CommonData, Sheet};
 

@@ -1,10 +1,7 @@
 mod redpianov2;
 use std::ops::{Deref, DerefMut};
 
-use crate::{
-    draw::{Area, Draw},
-    event::Event,
-};
+use crate::{draw::Draw, event::Event};
 
 pub trait Sheet: Deref<Target = CommonData> + DerefMut {
     fn tr_len(&self) -> usize;

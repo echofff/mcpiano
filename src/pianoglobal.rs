@@ -4,22 +4,29 @@ use crate::*;
 use wasm_bindgen::prelude::*;
 use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
 
-#[derive(serde::Deserialize)]
-pub struct NoteBox {
-    pub name: String,
-    pub hash: String,
-    //size: usize,
-    #[serde(skip_deserializing)]
-    pub audio: Option<AudioBuffer>,
+#[wasm_bindgen]
+pub struct PianoGlobal {
+
+    #[wasm_bindgen(skip)]
+    pub actx: Player,
+    //tracks: Vec<Track>,
+    #[wasm_bindgen(skip)]
+    pub sheet: Box<dyn Sheet>,
+
+    #[wasm_bindgen(skip)]
+    pub rt: RuntimeData,
+
+    #[wasm_bindgen(skip)]
+    pub theme: Theme,
+
+    #[wasm_bindgen(skip)]
+    pub cctx: Draw,
 }
 
 pub struct RuntimeData {
     //pub sel_inst: usize,
     //pub maxnote: usize,
-    pub pause: bool,
-
     pub pos: (usize, usize),
-    pub volumn: f32,
 
     // u8 is beat, in fromat 0bxxxx
     pub error_hl: Vec<(usize, u8)>,
@@ -93,37 +100,11 @@ impl RuntimeData {
         RuntimeData {
             //sel_inst: 11,
             //maxnote: 20,
-            pause: true,
-            volumn: 0.7f32,
             pos: (0, 0),
 
             error_hl: Vec::new(),
             select_hl: Vec::new(),
             play_bt: 0,
         }
-    }
-}
-
-impl NoteBox {
-    pub async fn genab(&mut self, ctx: &AudioContext) -> Result<(), JsValue> {
-        let mut opts = RequestInit::new();
-        opts.method("GET");
-        let urls = format!("./res/{}", self.hash);
-
-        let req = Request::new_with_str_and_init(&urls, &opts)?;
-        let window = web_sys::window().unwrap();
-
-        let resp: Response = JsFuture::from(window.fetch_with_request(&req))
-            .await?
-            .dyn_into()?;
-        let ab = JsFuture::from(resp.array_buffer()?).await?.dyn_into()?;
-
-        let ab = JsFuture::from(ctx.decode_audio_data(&ab)?)
-            .await?
-            .dyn_into()?;
-
-        self.audio = Some(ab);
-
-        Ok(())
     }
 }

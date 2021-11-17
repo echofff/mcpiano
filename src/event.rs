@@ -171,7 +171,7 @@ impl PianoGlobal {
     }
 
     fn click_play(&mut self, ic: u8) {
-        self.play(self.sheet.sel_inst as u8, 24 - ic);
+        self.actx.play(self.sheet.sel_inst as u8, 24 - ic);
     }
 
     fn click_del(&mut self, ni: usize, beat: u8, y: usize, shift: bool) {
