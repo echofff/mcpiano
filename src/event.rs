@@ -87,39 +87,14 @@ impl PianoGlobal {
     }
 
     pub fn input_key(&mut self, key: usize) -> bool {
-        let (x, _) = self.pos;
-        if let Some((i, _)) = KEYM.into_iter().enumerate().find(|(_, n)| *n == key) {
-            if x > 4 {
-                let (ni, beat) = ((x - 4) >> 2, 0b1000 >> (x & 0b11));
-                self.click_edit(ni, beat, 24 - i, false);
-            } else {
-                self.play(self.sheet.sel_inst as u8, i as u8);
-            }
+        let (x, y) = self.pos;
+
+        if !self.sheet.key(x, y, key) {
             self.draw_all();
-            return false;
+            false
+        } else {
+            true
         }
-
-        //match key {
-        //    38 => self
-        //        .tracks
-        //        .iter_mut()
-        //        .filter(|t| !t.hide)
-        //        .filter_map(|t| t.get_mut((x - 4) >> 2))
-        //        .filter(|n| n.note < 24)
-        //        .for_each(|n| n.note += 1),
-        //    40 => self
-        //        .tracks
-        //        .iter_mut()
-        //        .filter(|t| !t.hide)
-        //        .filter_map(|t| t.get_mut((x - 4) >> 2))
-        //        .filter(|n| n.note > 0)
-        //        .for_each(|n| n.note -= 1),
-
-        //    _ => return true,
-        //}
-
-        self.draw_all();
-        false
     }
 }
 
@@ -219,11 +194,6 @@ impl PianoGlobal {
         //  }
     }
 }
-
-const KEYM: [usize; 25] = [
-    192, 9, 49, 81, 50, 87, 69, 52, 82, 53, 84, 89, 55, 85, 56, 73, 57, 79, 80, 173, 219, 61, 221,
-    220, 8,
-];
 
 pub enum Action {
     Set,

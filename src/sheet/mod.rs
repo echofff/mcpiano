@@ -7,9 +7,7 @@ use crate::{
 };
 
 pub trait Sheet: Deref<Target = CommonData> + DerefMut {
-    //fn for_each_track(&self,f: fn(x:usize,usize) -> ());
     fn tr_len(&self) -> usize;
-    fn colo(&self, ti: usize) -> usize;
     fn click(&mut self, event: Event);
 
     fn draw(&self, c: &Draw);
@@ -23,6 +21,8 @@ pub trait Sheet: Deref<Target = CommonData> + DerefMut {
 
     fn resize(&mut self, tar: usize) -> usize;
     fn time(&self) -> usize;
+
+    fn key(&mut self, x: usize, y: usize, key: usize) -> bool;
 }
 
 pub struct CommonData {
