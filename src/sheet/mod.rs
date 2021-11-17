@@ -14,7 +14,7 @@ pub trait Sheet: Deref<Target = CommonData> + DerefMut {
 
     fn save_comp(&self) -> String;
 
-    fn add_inst(&self, inst: usize, color_s: String);
+    fn add_inst(&mut self, inst: usize, color_s: String);
 
     fn resize(&mut self, tar: usize) -> usize;
     fn time(&self) -> usize;

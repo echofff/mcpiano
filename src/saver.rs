@@ -7,47 +7,14 @@ use crate::*;
 impl PianoGlobal {
     pub fn save(&self) -> String {
         self.sheet.save()
-        //match serde_json::to_value(&self.tracks) {
-        //    Ok(v) => {
-        //        let mut map = Map::new();
-        //        map.insert(String::from("tracks"), v);
-        //        map.insert(String::from("version"), json!(2));
-        //        serde_json::Value::Object(map).to_string()
-        //    }
-        //    Err(e) => {
-        //        format!("save failed {:?}", e)
-        //    }
-        //}
     }
 
     pub fn save_comp(&self) -> String {
         self.sheet.save_comp()
-        //let length = self.tracks.len() * (self.tracks[0].len() + 20);
-        //let mut res = String::with_capacity(length);
-
-        //self.tracks.iter().for_each(|t| {
-        //    res.insert_str(res.len(), "Z");
-        //    t.iter().for_each(|n| {
-        //        res.push(NOTE[n.note as usize] as char);
-        //        res.push(BEAT[n.beat as usize] as char);
-        //    });
-        //    res.push('\r');
-        //    res.push('\n');
-        //});
-
-        //res
     }
 
     pub fn load(&mut self, json: String) {
-        //serde_json::to_string(&self.config).unwrap_throw()
         self.sheet.load(json);
-
-        //match serde_json::from_str(json.as_str()) {
-        //    Ok(SaveConf { tracks, .. }) => self.tracks = tracks,
-        //    Err(e) => {
-        //        l(format!("load filed by {:?}", e));
-        //    }
-        //};
     }
 
     pub fn add_track(&mut self, inst: i32, colo_s: String) {

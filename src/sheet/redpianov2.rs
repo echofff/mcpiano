@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
-use wasm_bindgen::JsValue;
+use serde_json::{json, Map, Value};
+use wasm_bindgen::{throw_str, JsValue, UnwrapThrowExt};
 
 use crate::draw::{Area, Draw};
 use crate::event::{Event, Key, KeyCata};
@@ -124,14 +125,47 @@ impl Sheet for RedPianoV2 {
     }
 
     fn save(&self) -> String {
-        String::from("TODO")
+        match serde_json::to_value(&self.tracks) {
+            Ok(v) => {
+                let mut map = Map::new();
+                map.insert(String::from("tracks"), v);
+                map.insert(String::from("version"), json!(2));
+                serde_json::Value::Object(map).to_string()
+            }
+            Err(e) => {
+                format!("save failed {:?}", e)
+            }
+        }
     }
-    fn load(&mut self, str: String) {
-        todo!();
+    fn load(&mut self, json: String) {
+        //serde_json::to_string(&self.config).unwrap_throw()
+        let saver = serde_json::from_str(&json);
+        crate::l(format!("{:?}", saver));
+        match saver {
+            Ok(SaverV2 {
+                tracks: Some(tracks),
+                version: Some(2),
+            }) => self.tracks = tracks,
+            _ => {}
+        };
     }
 
     fn save_comp(&self) -> String {
         String::from("TODO")
+        //let length = self.tracks.len() * (self.tracks[0].len() + 20);
+        //let mut res = String::with_capacity(length);
+
+        //self.tracks.iter().for_each(|t| {
+        //    res.insert_str(res.len(), "Z");
+        //    t.iter().for_each(|n| {
+        //        res.push(NOTE[n.note as usize] as char);
+        //        res.push(BEAT[n.beat as usize] as char);
+        //    });
+        //    res.push('\r');
+        //    res.push('\n');
+        //});
+
+        //res
     }
 
     fn key(&mut self, x: usize, _: usize, key: usize) -> bool {
@@ -166,7 +200,14 @@ impl Sheet for RedPianoV2 {
         false
     }
 
-    fn add_inst(&self, inst: usize, color_s: String) {}
+    fn add_inst(&mut self, inst: usize, color_s: String) {
+        self.tracks.push(Track {
+            inst,
+            hide: false,
+            colo_s: color_s,
+            notes: Default::default(),
+        });
+    }
 
     fn resize(&mut self, tar: usize) -> usize {
         let tar = self
@@ -249,6 +290,12 @@ impl Sheet for RedPianoV2 {
             .filter(|(_, t)| t.inst == self.sel_inst)
             .for_each(|(i, t)| t.draw_track(c, i, l));
     }
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct SaverV2 {
+    tracks: Option<Vec<Track>>,
+    version: Option<i32>,
 }
 
 impl RedPianoV2 {
@@ -346,20 +393,19 @@ impl RedPianoV2 {
     }
 }
 
-#[derive(Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Clone, serde::Deserialize, serde::Serialize, Default, Debug)]
 pub struct Note {
     pub note: u8,
     pub beat: u8,
 }
 
-#[derive(Clone, serde::Deserialize, serde::Serialize, Default)]
+#[derive(Clone, serde::Deserialize, serde::Serialize, Default, Debug)]
 pub struct Track {
     pub inst: usize,
     pub hide: bool,
 
-    #[serde(skip_deserializing, skip_serializing)]
-    pub colo: JsValue,
-
+    //#[serde(skip_deserializing, skip_serializing)]
+    //pub colo: JsValue,
     pub colo_s: String,
 
     pub notes: Vec<Note>,
@@ -370,13 +416,13 @@ impl Track {
         let notes = vec![Default::default()];
         let inst = 11;
         let hide = false;
-        let colo = JsValue::from_str("#9a9dea");
+        //let colo = JsValue::from_str("#9a9dea");
         let colo_s = String::from("#9a9dea");
         Track {
             inst,
             hide,
             notes,
-            colo,
+            //colo,
             colo_s,
         }
     }
