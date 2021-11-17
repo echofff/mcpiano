@@ -9,9 +9,8 @@ mod play;
 mod saver;
 mod sheet;
 mod track;
+use draw::Draw;
 use pianoglobal::*;
-
-use track::*;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::throw_str;
@@ -53,8 +52,6 @@ use crate::sheet::RedPianoV2;
 #[wasm_bindgen]
 pub struct PianoGlobal {
     actx: AudioContext,
-    cctx: CanvasRenderingContext2d,
-    canv: HtmlCanvasElement,
     sounds: Vec<NoteBox>,
 
     //tracks: Vec<Track>,
@@ -63,6 +60,8 @@ pub struct PianoGlobal {
     rt: RuntimeData,
 
     theme: Theme,
+
+    cctx: Draw,
 }
 
 #[wasm_bindgen]
@@ -74,6 +73,17 @@ impl PianoGlobal {
 
         let (canv, cctx) = Self::scanvas();
 
+        let cctx = Draw {
+            cctx,
+            canv,
+            cube_w: 20f64,
+            cube_h: 20f64,
+            borde: 1f64,
+            titles: 4,
+            win_w: 1900f64,
+            win_h: 1000f64,
+        };
+
         //let tracks = vec![Track::new()];
 
         let theme = Theme::new();
@@ -83,7 +93,6 @@ impl PianoGlobal {
         PianoGlobal {
             actx,
             cctx,
-            canv,
             sounds,
             sheet,
 

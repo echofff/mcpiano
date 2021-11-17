@@ -28,7 +28,7 @@ impl PianoGlobal {
     }
 
     pub fn play_continue(&self) -> bool {
-        self.maxnote > self.play_bt >> 2
+        self.sheet.time()/4 > self.play_bt >> 2
     }
 
     pub fn play_stage(&mut self) -> bool {

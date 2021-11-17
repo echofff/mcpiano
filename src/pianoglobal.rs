@@ -14,8 +14,8 @@ pub struct NoteBox {
 }
 
 pub struct RuntimeData {
-    pub sel_inst: usize,
-    pub maxnote: usize,
+    //pub sel_inst: usize,
+    //pub maxnote: usize,
     pub pause: bool,
 
     pub pos: (usize, usize),
@@ -27,15 +27,6 @@ pub struct RuntimeData {
 
     pub play_bt: usize,
 
-    pub cube_w: f64,
-    pub cube_h: f64,
-    //pub cellw: f64,
-    //pub cellh: f64,
-    pub borde: f64,
-    //pub titlw: f64,
-    pub titles: usize,
-    pub win_w: f64,
-    pub win_h: f64,
 }
 
 impl Deref for PianoGlobal {
@@ -53,15 +44,15 @@ impl DerefMut for PianoGlobal {
 }
 
 pub struct Theme {
-    pub control: [JsValue; 6],
-    pub track_row: Vec<JsValue>,
-    pub note_row: Vec<JsValue>,
+    pub control: [String; 6],
+    pub track_row: Vec<String>,
+    pub note_row: Vec<String>,
 
-    pub sel: JsValue,
-    pub error: JsValue,
-    pub play: JsValue,
+    pub sel: String,
+    pub error: String,
+    pub play: String,
 
-    pub hover: JsValue,
+    pub hover: String,
 }
 
 impl Theme {
@@ -101,17 +92,11 @@ impl Theme {
 impl RuntimeData {
     pub fn new() -> RuntimeData {
         RuntimeData {
-            sel_inst: 11,
-            maxnote: 20,
+            //sel_inst: 11,
+            //maxnote: 20,
             pause: true,
             volumn: 0.7f32,
             pos: (0, 0),
-            cube_w: 20f64,
-            cube_h: 20f64,
-            borde: 1f64,
-            titles: 4,
-            win_w: 1900f64,
-            win_h: 1000f64,
 
             error_hl: Vec::new(),
             select_hl: Vec::new(),

@@ -66,12 +66,11 @@ impl PianoGlobal {
     }
 
     pub fn resize(&mut self, n: i32) {
-        let n = if n < 0 { self.maxnote } else { n as usize };
+        let n = if n < 0 { 0 } else { n as usize };
 
         self.sheet.resize(n);
         let l = self.sheet.time() + 4;
         let h = self.sheet.tr_len() + 25;
-
 
         // let tar = max_note.max(n);
         // self.maxnote = tar;
@@ -82,14 +81,11 @@ impl PianoGlobal {
         //     .iter_mut()
         //     .for_each(|t| t.resize(tar, Default::default()));
 
-        let width = self.cube_w * l as f64;
-        let height = self.cube_h * h as f64;
+        let width = self.cctx.cube_w * l as f64;
+        let height = self.cctx.cube_h * h as f64;
 
-        self.win_w = width;
-        self.win_h = height;
+        self.cctx.resize(l,h);
 
-        self.canv.set_width(width as u32);
-        self.canv.set_height(height as u32);
 
         self.draw_all();
         //alert("asdfasdf");
@@ -108,7 +104,6 @@ impl PianoGlobal {
     fn shunk(&mut self) {
         //self.sheet.shunk();
         //let mut last = self.maxnote - 1;
-
     }
 }
 

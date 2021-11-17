@@ -1,12 +1,18 @@
 mod redpianov2;
-use crate::event::Action;
-use crate::draw::Area;
+use std::ops::{Deref, DerefMut};
 
-pub trait Sheet {
+use crate::{
+    draw::{Area, Draw},
+    event::Event,
+};
+
+pub trait Sheet: Deref<Target = CommonData> + DerefMut {
     //fn for_each_track(&self,f: fn(x:usize,usize) -> ());
     fn tr_len(&self) -> usize;
     fn colo(&self, ti: usize) -> usize;
-    fn click(&self, x: usize, y: usize, area: Area, act: Action);
+    fn click(&mut self, event: Event);
+
+    fn draw(&self, c: &Draw);
 
     fn save(&self) -> String;
     fn load(&mut self, str: String);
@@ -17,8 +23,13 @@ pub trait Sheet {
 
     fn resize(&mut self, tar: usize) -> usize;
     fn time(&self) -> usize;
+}
 
-    //fn shunk(&mut self);
+pub struct CommonData {
+    pub sel_inst: usize,
+
+    // tick per mark
+    pub tpm: usize,
 }
 
 pub use redpianov2::RedPianoV2;
