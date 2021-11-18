@@ -168,7 +168,7 @@ impl Sheet for RedPianoV2 {
         //res
     }
 
-    fn key(&mut self, x: usize, _: usize, key: usize) -> bool {
+    fn key(&mut self, x: usize, _: usize, key: usize) -> Option<(usize, usize)> {
         if let Some((i, _)) = KEYM.into_iter().enumerate().find(|(_, n)| *n == key) {
             if x > 4 {
                 let (ni, beat) = ((x - 4) >> 2, 0b1000 >> (x & 0b11));
@@ -177,27 +177,30 @@ impl Sheet for RedPianoV2 {
                 todo!("play when hit a key");
                 //self.play(self.sheet.sel_inst as u8, i as u8);
             }
-            return false;
+            return Some((self.sel_inst, i));
         }
         match key {
-            38 => self
-                .tracks
-                .iter_mut()
-                .filter(|t| !t.hide)
-                .filter_map(|t| t.get_mut((x - 4) >> 2))
-                .filter(|n| n.note < 24)
-                .for_each(|n| n.note += 1),
-            40 => self
-                .tracks
-                .iter_mut()
-                .filter(|t| !t.hide)
-                .filter_map(|t| t.get_mut((x - 4) >> 2))
-                .filter(|n| n.note > 0)
-                .for_each(|n| n.note -= 1),
+            38 => {
+                self.tracks
+                    .iter_mut()
+                    .filter(|t| !t.hide)
+                    .filter_map(|t| t.get_mut((x - 4) >> 2))
+                    .filter(|n| n.note < 24)
+                    .for_each(|n| n.note += 1);
+                Some((self.sel_inst, 24))
+            }
+            40 => {
+                self.tracks
+                    .iter_mut()
+                    .filter(|t| !t.hide)
+                    .filter_map(|t| t.get_mut((x - 4) >> 2))
+                    .filter(|n| n.note > 0)
+                    .for_each(|n| n.note -= 1);
+                Some((self.sel_inst, 0))
+            }
 
-            _ => return true,
+            _ => None,
         }
-        false
     }
 
     fn add_inst(&mut self, inst: usize, color_s: String) {
@@ -244,7 +247,7 @@ impl Sheet for RedPianoV2 {
         self.tracks.iter().map(|t| t.len()).max().unwrap_or(1) * 4
     }
 
-    fn click(&mut self, event: crate::event::Event) {
+    fn click(&mut self, event: crate::event::Event) -> bool {
         let (ni, beat) = (event.xi >> 2, 0b1000 >> (event.xi & 0b11) as u8);
         match event {
             Event {
@@ -263,8 +266,9 @@ impl Sheet for RedPianoV2 {
                 ctrl,
                 ..
             } => self.click_del(ni, beat, yi, ctrl),
-            _ => {}
+            _ => return false,
         }
+        true
 
         //match (area, cata, key) {
         //    (Area::EditPlane, 0 | 1, 1) => self.click_edit(ni, beat, yi, ctrl),
@@ -552,7 +556,7 @@ impl DerefMut for Track {
         &mut self.notes
     }
 }
-const KEYM: [usize; 25] = [
+pub const KEYM: [usize; 25] = [
     192, 9, 49, 81, 50, 87, 69, 52, 82, 53, 84, 89, 55, 85, 56, 73, 57, 79, 80, 173, 219, 61, 221,
     220, 8,
 ];

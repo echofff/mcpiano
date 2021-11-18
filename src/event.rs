@@ -60,7 +60,7 @@ impl PianoGlobal {
         let cata = &[KeyCata::Down, KeyCata::Move, KeyCata::Up][cata as usize];
         let key = &[Key::Empty, Key::Left, Key::Right, Key::Empty, Key::Mid][key as usize];
 
-        self.sheet.click(Event {
+        if self.sheet.click(Event {
             xi,
             yi,
             key,
@@ -69,16 +69,18 @@ impl PianoGlobal {
             shift,
             ctrl,
             alt,
-        });
-
+        }) {
+            self.actx.play(self.sheet.sel_inst, 23 - yi + ts);
+        }
         self.draw_all();
     }
 
     pub fn input_key(&mut self, key: usize) -> bool {
         let (x, y) = self.pos;
 
-        if !self.sheet.key(x, y, key) {
+        if let Some((inst, k)) = self.sheet.key(x, y, key) {
             self.draw_all();
+            self.actx.play(inst, k);
             false
         } else {
             true

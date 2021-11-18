@@ -69,7 +69,7 @@ impl Player {
     pub fn set_volumn(&mut self, volumn: f32) {
         self.volumn = volumn;
     }
-    pub fn play(&self, inst: u8, note: u8) {
+    pub fn play(&self, inst: usize, note: usize) {
         let a = self.actx.create_buffer_source().unwrap_throw();
         let g = self.actx.create_gain().unwrap_throw();
 
