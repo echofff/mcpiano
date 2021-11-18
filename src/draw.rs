@@ -17,6 +17,9 @@ pub struct Draw {
     pub borde: f64,
     pub win_w: f64,
     pub win_h: f64,
+
+    pub wi: usize,
+    pub hi: usize,
 }
 
 impl Draw {
@@ -31,6 +34,8 @@ impl Draw {
             titles: 4,
             win_w: 1900f64,
             win_h: 1000f64,
+            hi: 0,
+            wi: 0,
         }
     }
     fn scanvas() -> (HtmlCanvasElement, CanvasRenderingContext2d) {
@@ -51,6 +56,8 @@ impl Draw {
         (canvas, context)
     }
     pub fn resize(&mut self, l: usize, h: usize) {
+        self.wi = l;
+        self.hi = h;
         self.win_w = l as f64 * self.cube_w;
         self.win_h = h as f64 * self.cube_h;
 
@@ -74,15 +81,17 @@ impl Draw {
         self.cctx.set_fill_style(&col.into());
     }
 
-    pub fn vert(&self, ni: usize, beat: u8, len: usize) {
-        let ni = ni * 4 + 4;
-        (ni..ni + 4)
-            .into_iter()
-            .zip(BEATS.into_iter())
-            .filter(|(_, b)| b & beat != 0)
-            .for_each(|(ni, _)| {
-                self.rect(ni, 0, 1, len, false);
-            });
+    pub fn vert(&self, xi: usize) {
+        self.rect(xi, 0, 1, self.hi, false);
+
+        //let ni = ni * 4 + 4;
+        //(ni..ni + 4)
+        //    .into_iter()
+        //    .zip(BEATS.into_iter())
+        //    .filter(|(_, b)| b & beat != 0)
+        //    .for_each(|(ni, _)| {
+        //        self.rect(ni, 0, 1, len, false);
+        //    });
     }
 
     pub fn down_line(&self, x: usize, y: usize) {
@@ -177,22 +186,22 @@ impl PianoGlobal {
 
     fn draw_hightlight(&self) {
         let len = self.sheet.time();
-        self.cctx.style_fill(&self.theme.sel);
-        self.select_hl.iter().for_each(|(ni, beat)| {
-            self.cctx.vert(*ni, *beat, len);
-        });
-        self.cctx.style_fill(&self.theme.error);
-        self.error_hl.iter().for_each(|(ni, beat)| {
-            self.cctx.vert(*ni, *beat, len);
-        });
+        //self.cctx.style_fill(&self.theme.sel);
+        //self.select_hl.iter().for_each(|(ni, beat)| {
+        //    self.cctx.vert(*ni, *beat, len);
+        //});
+        //self.cctx.style_fill(&self.theme.error);
+        //self.error_hl.iter().for_each(|(ni, beat)| {
+        //    self.cctx.vert(*ni, *beat, len);
+        //});
 
         self.cctx.style_fill(&self.theme.play);
         let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
-        self.cctx.vert(ni, beat, len);
+        //self.cctx.vert(ni, beat, len);
 
         self.cctx.style_fill(&self.theme.hover);
-        let (ni, beat) = ((self.pos.0 >> 2) - 1, 0b1000 >> (self.pos.0 & 0b11));
-        self.cctx.vert(ni, beat, len);
+        //let (ni, beat) = ((self.pos.0 >> 2) - 1, 0b1000 >> (self.pos.0 & 0b11));
+        self.cctx.vert(self.pos.0);
     }
 }
 
