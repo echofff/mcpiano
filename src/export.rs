@@ -6,7 +6,8 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl PianoGlobal {
     pub fn export(&self) -> String {
-        let mut res = String::new();
+        //let mut res = String::new();
+        self.sheet.export()
 
         // self.tracks.iter().enumerate().for_each(|(i, t)| {
         //     let (n, b) = Self::track_pre(t);
@@ -14,7 +15,6 @@ impl PianoGlobal {
         //     res.push_str(Self::shulk_i(&n, i, true).as_str());
         //     res.push_str(Self::shulk_i(&b, i, false).as_str());
         // });
-        res
     }
 }
 impl PianoGlobal {

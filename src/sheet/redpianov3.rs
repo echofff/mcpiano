@@ -5,6 +5,9 @@ use wasm_bindgen::{throw_str, JsValue, UnwrapThrowExt};
 
 use crate::draw::{Area, Draw};
 use crate::event::{Event, Key, KeyCata};
+use crate::map::{DELAY_NAME, TIME_MARK};
+use crate::map::{SYMBOL, SYMBOL_NAME};
+use crate::mccommand::{items2String, Item};
 
 use super::{CommonData, Sheet};
 
@@ -91,7 +94,7 @@ impl Sheet for RedPianoV3 {
         match event {
             Event {
                 area: Area::EditPlane,
-                cata: KeyCata::Down,
+                cata: KeyCata::Down | KeyCata::Move,
                 key: Key::Left,
                 xi,
                 yi,
@@ -125,7 +128,7 @@ impl Sheet for RedPianoV3 {
                     .iter()
                     .enumerate()
                     .rev()
-                    .find(|(_, e)| e.time < xi && !e.down && e.note == 24 - yi)
+                    .find(|(_, e)| e.time <= xi && !e.down && e.note == 24 - yi)
                     .map(|(i, e)| (i, xi - e.time));
 
                 match (before, after) {
@@ -147,7 +150,7 @@ impl Sheet for RedPianoV3 {
                             .enumerate()
                             .rev()
                             .find(|(_, e)| e.time < xi)
-                            .map(|(i, _)| i+1)
+                            .map(|(i, _)| i + 1)
                             .unwrap_or(0usize);
                         self.events.insert(
                             i,
@@ -163,7 +166,7 @@ impl Sheet for RedPianoV3 {
                             .enumerate()
                             .rev()
                             .find(|(_, e)| e.time < xi + 4)
-                            .map(|(i, _)| i+1)
+                            .map(|(i, _)| i + 1)
                             .unwrap_or(0usize);
                         self.events.insert(
                             i,
@@ -179,6 +182,7 @@ impl Sheet for RedPianoV3 {
                 self.gen_tmp();
 
                 //crate::alert(format!("--{:?}--",self.tmp).as_str());
+                crate::log(format!("--{:?}--", self.events).as_str());
 
                 //.filter(|(i, e)| e.note == 24 - yi && e.time < xi + 4 && e.time > xi - 4)
                 //.collect::<Vec<_>>();
@@ -244,11 +248,80 @@ impl Sheet for RedPianoV3 {
     }
 
     fn key(&mut self, x: usize, y: usize, key: usize) -> Option<(usize, usize)> {
-        todo!()
+        //todo!()
+        Some((11, 24 - y))
     }
 
     fn export(&self) -> String {
-        String::new()
+        let mut items = [[Vec::new(), Vec::new()], [Vec::new(), Vec::new()]];
+        let mut time = 0;
+        let mut event = self.events.iter().filter(|e| e.down);
+        while let Some(e) = event.next() {
+            if e.time > time {
+                while e.time - time >= 16 {
+                    items[0][0].add(0, 25);
+                    items[0][1].add(1, 0);
+                    time += 4;
+                }
+                items[0][0].add(0, e.note);
+                items[0][1].add(1, e.time - time);
+                time += 4;
+            } else {
+                crate::alert(format!("Confident at time {}", time).as_str());
+                return String::new();
+            }
+        }
+
+        let mut time = 0;
+        let mut event = self.events.iter().filter(|e| !e.down);
+        while let Some(e) = event.next() {
+            if e.time > time {
+                while e.time - time >= 16 {
+                    items[1][0].add(0, 25);
+                    items[1][1].add(1, 0);
+                    time += 4;
+                }
+                items[1][0].add(0, e.note);
+                items[1][1].add(1, e.time - time);
+                time += 4;
+            } else {
+                crate::alert(format!("Confident at time {}", time).as_str());
+                return String::new();
+            }
+        }
+        crate::log(format!("-- {:?}", items).as_str());
+
+        format!("开始 音符\r\n/give @p minecraft:chest{}\r\n开始 延迟\r\n/give @p minecraft:chest{}\r\n结束 音符\r\n/give @p minecraft:chest{}\r\n结束 延迟\r\n/give @p minecraft:chest{}\r\n",
+                items2String(&mut items[0][0],String::from("start_note")),
+                items2String(&mut items[0][1],String::from("start_note")),
+                items2String(&mut items[1][0],String::from("start_note")),
+                items2String(&mut items[1][1],String::from("start_note")),
+                )
+    }
+}
+
+trait AutoItems {
+    fn add(&mut self, t: usize, id: usize);
+}
+impl AutoItems for Vec<Item> {
+    fn add(&mut self, t: usize, id: usize) {
+        let (id, name) = if t == 0 {
+            (SYMBOL[id], SYMBOL_NAME[id])
+        } else {
+            (TIME_MARK[id], DELAY_NAME[id])
+        };
+        if let Some(i) = self.last_mut() {
+            if i.id == id {
+                i.Count += 1;
+                return;
+            }
+        }
+        self.push(Item {
+            id,
+            tag: json!({ "display": { "Name":format!( "{{\"text\": \"{}\"}}",name ) } }),
+            Slot: 0,
+            Count: 1,
+        })
     }
 }
 

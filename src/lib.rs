@@ -4,6 +4,7 @@ mod draw;
 mod event;
 mod export;
 mod map;
+mod mccommand;
 mod pianoglobal;
 mod play;
 mod saver;

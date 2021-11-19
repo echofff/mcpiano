@@ -120,7 +120,7 @@ impl RedPianoV2 {
 }
 
 impl Sheet for RedPianoV2 {
-    fn export(&self) -> String{
+    fn export(&self) -> String {
         String::new()
     }
     fn tr_len(&self) -> usize {

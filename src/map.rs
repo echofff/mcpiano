@@ -30,6 +30,11 @@ pub const TITLE: [&str; 28] = [
     "dummy ",
     "dummy ",
 ];
+pub const SYMBOL_NAME: [&str; 28] = [
+    "0_F#", "1_G", "2_G#", "3_A", "4_A#", "5_B", "6_C", "7_C#", "8_D", "9_D#", "10_E", "11_F",
+    "12_F#", "13_G", "14_G#", "15_A", "16_A#", "17_B", "18_C", "19_C#", "20_D", "21_D#", "22_E",
+    "23_F", "24_F#", "dummy ", "dummy ", "dummy ",
+];
 
 pub const SYMBOL: [&str; 28] = [
     "minecraft:white_concrete",
@@ -86,5 +91,9 @@ pub const TIME_MARK: [&str; 18] = [
     "minecraft:birch_fence",
     "minecraft:spruce_fence",
 ];
+pub const DELAY_NAME: [&str; 16] = [
+    "0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24", "26", "28", "30",
+];
+pub const EMPTY: [&str; 2] = ["minecraft:birch_fence", "minecraft:spruce_fence"];
 
 //pub const DUMMY: [&str; 2] = ["minecraft:birch_fence", "minecraft:spruce_fence"];
