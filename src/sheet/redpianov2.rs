@@ -299,6 +299,10 @@ impl Sheet for RedPianoV2 {
             .filter(|(_, t)| t.inst == self.sel_inst)
             .for_each(|(i, t)| t.draw_track(c, i, l));
     }
+
+    fn play(&self, t: usize) -> Vec<(usize, usize)> {
+        vec![(11, 11)]
+    }
 }
 
 #[derive(serde::Deserialize, Debug)]

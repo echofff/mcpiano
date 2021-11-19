@@ -1,3 +1,4 @@
+use crate::PianoGlobal;
 use wasm_bindgen::{prelude::*, throw_str, JsCast};
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{AudioBuffer, AudioContext, Request, RequestInit, Response};
@@ -83,14 +84,32 @@ impl Player {
 
         a.start().expect_throw("start play");
     }
+}
 
+#[wasm_bindgen]
+impl PianoGlobal {
     pub fn play_start(&mut self) -> bool {
         self.pause ^= true;
         !self.pause
     }
-
+    pub fn play_continue(&self) -> bool {
+        !self.pause
+    }
     pub fn play_stage(&mut self) -> bool {
-        false
+        if self.sheet.time() > self.play_bt {
+            self.play_bt += 1;
+            self.draw_all();
+            self.sheet
+                .play(self.play_bt)
+                .into_iter()
+                .for_each(|(inst, note)| self.actx.play(inst, note));
+            true
+        } else {
+            self.pause = true;
+            self.play_bt = 0;
+            self.draw_all();
+            false
+        }
     }
 }
 

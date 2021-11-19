@@ -184,13 +184,15 @@ impl PianoGlobal {
         });
 
         self.cctx.style_fill(&self.theme.play);
-        let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
+        //let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
+        self.cctx.vert(4 + self.play_bt);
 
         self.cctx.style_fill(&self.theme.hover);
         self.cctx.vert(self.pos.0);
     }
 }
 
+#[derive(PartialEq, PartialOrd)]
 pub enum Area {
     TrackControl,
     TrackSecquence,

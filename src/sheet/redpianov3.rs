@@ -364,6 +364,14 @@ impl Sheet for RedPianoV3 {
                 items2String(&mut items[1][1],String::from("start_note")),
                 )
     }
+
+    fn play(&self, t: usize) -> Vec<(usize, usize)> {
+        self.tmp
+            .iter()
+            .filter(|(_, start, end)| *start + 1 <= t && t < *end + 1)
+            .map(|(n, _, _)| (11, *n))
+            .collect::<Vec<_>>()
+    }
 }
 
 trait AutoItems {

@@ -3,6 +3,7 @@ use crate::PianoGlobal;
 use crate::draw::Area;
 use wasm_bindgen::prelude::*;
 
+#[derive(PartialEq, PartialOrd)]
 pub enum Key {
     Empty,
     Left,
@@ -10,6 +11,7 @@ pub enum Key {
     Mid,
 }
 
+#[derive(PartialEq, PartialOrd)]
 pub enum KeyCata {
     Down,
     Up,
@@ -59,6 +61,10 @@ impl PianoGlobal {
 
         let cata = &[KeyCata::Down, KeyCata::Move, KeyCata::Up][cata as usize];
         let key = &[Key::Empty, Key::Left, Key::Right, Key::Empty, Key::Mid][key as usize];
+
+        if *area == Area::TrackSecquence && *key == Key::Right {
+            self.play_bt = xi;
+        };
 
         if self.sheet.click(Event {
             xi,

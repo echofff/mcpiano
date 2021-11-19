@@ -29,6 +29,7 @@ pub struct RuntimeData {
     // u8 is beat, in fromat 0bxxxx
     pub error_hl: Vec<(usize, u8)>,
     pub select_hl: Vec<(usize, u8)>,
+    pub pause: bool,
 
     pub play_bt: usize,
 }
@@ -103,6 +104,7 @@ impl RuntimeData {
             error_hl: Vec::new(),
             select_hl: Vec::new(),
             play_bt: 0,
+            pause: true,
         }
     }
 }
