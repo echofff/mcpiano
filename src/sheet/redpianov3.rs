@@ -60,6 +60,7 @@ impl RedPianoV3 {
             cd: CommonData {
                 sel_inst: 11,
                 tpm: 2,
+                error: Vec::new(),
             },
 
             tmp: Vec::new(),
@@ -85,6 +86,7 @@ impl RedPianoV3 {
         }
     }
     fn click_edit(&mut self, xi: usize, yi: usize) -> bool {
+        self.error = Vec::new();
         //let ni = xi >> 2;
         //let len = self.notes.len();
         self.resize(yi + 1);
@@ -314,7 +316,7 @@ impl Sheet for RedPianoV3 {
         None
     }
 
-    fn export(&self) -> String {
+    fn export(&mut self) -> String {
         let mut items = [[Vec::new(), Vec::new()], [Vec::new(), Vec::new()]];
         let mut time = 0;
         let mut event = self.events.iter().filter(|e| e.down);
@@ -330,6 +332,7 @@ impl Sheet for RedPianoV3 {
                 time += 4;
             } else {
                 crate::alert(format!("Confident at time {}", time).as_str());
+                self.error = vec![time];
                 return String::new();
             }
         }
@@ -348,6 +351,7 @@ impl Sheet for RedPianoV3 {
                 time += 4;
             } else {
                 crate::alert(format!("Confident at time {}", time).as_str());
+                self.error = vec![time];
                 return String::new();
             }
         }

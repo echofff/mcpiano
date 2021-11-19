@@ -21,7 +21,7 @@ pub trait Sheet: Deref<Target = CommonData> + DerefMut {
     fn resize(&mut self, tar: usize) -> usize;
     fn time(&self) -> usize;
 
-    fn export(&self) -> String;
+    fn export(&mut self) -> String;
 
     fn key(&mut self, x: usize, y: usize, key: usize) -> Option<(usize, usize)>;
 }
@@ -31,6 +31,7 @@ pub struct CommonData {
 
     // tick per mark
     pub tpm: usize,
+    pub error: Vec<usize>
 }
 
 pub use redpianov2::RedPianoV2;

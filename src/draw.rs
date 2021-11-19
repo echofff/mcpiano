@@ -190,10 +190,10 @@ impl PianoGlobal {
         //self.select_hl.iter().for_each(|(ni, beat)| {
         //    self.cctx.vert(*ni, *beat, len);
         //});
-        //self.cctx.style_fill(&self.theme.error);
-        //self.error_hl.iter().for_each(|(ni, beat)| {
-        //    self.cctx.vert(*ni, *beat, len);
-        //});
+        self.cctx.style_fill(&self.theme.error);
+        self.sheet.error.iter().for_each(|x| {
+            self.cctx.vert(*x);
+        });
 
         self.cctx.style_fill(&self.theme.play);
         let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));

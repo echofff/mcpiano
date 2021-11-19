@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl PianoGlobal {
-    pub fn export(&self) -> String {
+    pub fn export(&mut self) -> String {
         //let mut res = String::new();
         self.sheet.export()
 

@@ -21,6 +21,7 @@ impl RedPianoV2 {
             cd: CommonData {
                 sel_inst: 11,
                 tpm: 2,
+                error: Vec::new(),
             },
         }
     }
@@ -121,7 +122,7 @@ impl RedPianoV2 {
 }
 
 impl Sheet for RedPianoV2 {
-    fn export(&self) -> String {
+    fn export(&mut self) -> String {
         String::new()
     }
     fn tr_len(&self) -> usize {
