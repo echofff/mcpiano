@@ -1,4 +1,6 @@
 mod redpianov2;
+mod redpianov3;
+
 use std::ops::{Deref, DerefMut};
 
 use crate::{draw::Draw, event::Event};
@@ -30,3 +32,4 @@ pub struct CommonData {
 }
 
 pub use redpianov2::RedPianoV2;
+pub use redpianov3::RedPianoV3;

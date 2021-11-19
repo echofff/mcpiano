@@ -38,6 +38,7 @@ pub fn l(s: String) {
 use sheet::Sheet;
 
 use crate::sheet::RedPianoV2;
+use crate::sheet::RedPianoV3;
 
 #[wasm_bindgen]
 impl PianoGlobal {
@@ -48,7 +49,8 @@ impl PianoGlobal {
 
         let theme = Theme::new();
 
-        let sheet = Box::new(RedPianoV2::new());
+        //let sheet = Box::new(RedPianoV2::new());
+        let sheet = Box::new(RedPianoV3::new());
 
         PianoGlobal {
             actx,
