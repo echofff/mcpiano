@@ -1,5 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
 use wasm_bindgen::{throw_str, JsValue, UnwrapThrowExt};
 
@@ -8,6 +9,7 @@ use crate::event::{Event, Key, KeyCata};
 use crate::map::{DELAY_NAME, TIME_MARK};
 use crate::map::{SYMBOL, SYMBOL_NAME};
 use crate::mccommand::{items2String, Item};
+use crate::play::KEYM;
 
 use super::{CommonData, Sheet};
 
@@ -33,7 +35,7 @@ pub struct RedPianoV3 {
     tmp: Vec<(usize, usize, usize)>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 struct NoteEvent {
     note: usize,
     time: usize,
@@ -82,6 +84,108 @@ impl RedPianoV3 {
             };
         }
     }
+    fn click_edit(&mut self, xi: usize, yi: usize) -> bool {
+        //let ni = xi >> 2;
+        //let len = self.notes.len();
+        self.resize(yi + 1);
+        //crate::alert(format!("--click------").as_str());
+        //
+        if let Some(i) = self
+            .tmp
+            .iter()
+            .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
+        {
+            return false;
+        }
+
+        let after = self
+            .events
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.time > xi && e.down && e.note == 24 - yi)
+            .map(|(i, e)| (i, e.time - xi))
+            .next();
+
+        let before = self
+            .events
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.time <= xi && !e.down && e.note == 24 - yi)
+            .map(|(i, e)| (i, xi - e.time))
+            .last();
+
+        match (before, after) {
+            (Some((bi, b)), Some((ai, a))) if a + b < 12 => {
+                //self.events[bi].up = self.events[ai].up;
+                self.events.remove(ai);
+                self.events.remove(bi);
+            }
+            (_, Some((ai, a))) if a < 6 => {
+                self.events[ai].time = xi;
+            }
+            (Some((bi, b)), _) if b < 6 => {
+                self.events[bi].time = xi;
+            }
+            _ => {
+                let i = self
+                    .events
+                    .iter()
+                    .enumerate()
+                    .rev()
+                    .find(|(_, e)| e.time < xi)
+                    .map(|(i, _)| i + 1)
+                    .unwrap_or(0usize);
+                self.events.insert(
+                    i,
+                    NoteEvent {
+                        note: 24 - yi,
+                        time: xi,
+                        down: true,
+                    },
+                );
+                let i = self
+                    .events
+                    .iter()
+                    .enumerate()
+                    .rev()
+                    .find(|(_, e)| e.time < xi + 4)
+                    .map(|(i, _)| i + 1)
+                    .unwrap_or(0usize);
+                self.events.insert(
+                    i,
+                    NoteEvent {
+                        note: 24 - yi,
+                        time: xi + 4,
+                        down: false,
+                    },
+                );
+            }
+        };
+
+        self.gen_tmp();
+
+        //crate::alert(format!("--{:?}--",self.tmp).as_str());
+        crate::log(format!("--{:?}--", self.events).as_str());
+
+        //.filter(|(i, e)| e.note == 24 - yi && e.time < xi + 4 && e.time > xi - 4)
+        //.collect::<Vec<_>>();
+
+        //if let Some((i, n)) = self
+        //    .notes
+        //    .iter_mut()
+        //    .rev()
+        //    .skip(len - ni - 1)
+        //    .take(4)
+        //    //.inspect(|n| crate::alert(format!("--{:?}--", n).as_str()))
+        //    .enumerate()
+        //    .find(|(_, n)| n.note > 24)
+        //{
+        //    n.note = 24 - yi;
+        //    n.delay = i * 4 + (xi & 0b11);
+        //    //crate::alert(format!("--click{:?}--", n,).as_str());
+        //}
+        true
+    }
 }
 
 impl Sheet for RedPianoV3 {
@@ -100,107 +204,54 @@ impl Sheet for RedPianoV3 {
                 yi,
                 ctrl,
                 ..
+            } => return self.click_edit(xi, yi),
+            Event {
+                area: Area::EditPlane,
+                cata: KeyCata::Down | KeyCata::Move,
+                key: Key::Right,
+                xi,
+                yi,
+                ..
             } => {
-                //let ni = xi >> 2;
-                //let len = self.notes.len();
-                self.resize(yi + 1);
-                //crate::alert(format!("--click------").as_str());
-
-                if let Some(e) = self
-                    .events
+                if let Some((note, start, end)) = self
+                    .tmp
                     .iter()
-                    .find(|e| e.time > xi && e.note == 24 - yi)
+                    .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
                 {
-                    if !e.down {
-                        return false;
+                    if end - start <= 4 {
+                        self.events.remove(
+                            self.events
+                                .iter()
+                                .enumerate()
+                                .find(|(_, e)| e.note == *note && e.time == *start && e.down)
+                                .unwrap()
+                                .0,
+                        );
+                        self.events.remove(
+                            self.events
+                                .iter()
+                                .enumerate()
+                                .find(|(_, e)| e.note == *note && e.time == *end && !e.down)
+                                .unwrap()
+                                .0,
+                        );
+                    } else {
+                        if let Some(e) = self
+                            .events
+                            .iter_mut()
+                            .find(|e| e.time == xi && e.note == 24 - yi && e.down)
+                        {
+                            e.time += 1
+                        } else if let Some(e) = self
+                            .events
+                            .iter_mut()
+                            .find(|e| e.time == xi + 1 && e.note == 24 - yi && !e.down)
+                        {
+                            e.time -= 1
+                        }
                     }
                 }
-
-                let after = self
-                    .events
-                    .iter()
-                    .enumerate()
-                    .find(|(_, e)| e.time > xi && e.down && e.note == 24 - yi)
-                    .map(|(i, e)| (i, e.time - xi));
-
-                let before = self
-                    .events
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .find(|(_, e)| e.time <= xi && !e.down && e.note == 24 - yi)
-                    .map(|(i, e)| (i, xi - e.time));
-
-                match (before, after) {
-                    (Some((bi, b)), Some((ai, a))) if a + b < 12 => {
-                        //self.events[bi].up = self.events[ai].up;
-                        self.events.remove(ai);
-                        self.events.remove(bi);
-                    }
-                    (_, Some((ai, a))) if a < 6 => {
-                        self.events[ai].time = xi;
-                    }
-                    (Some((bi, b)), _) if b < 6 => {
-                        self.events[bi].time = xi;
-                    }
-                    _ => {
-                        let i = self
-                            .events
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .find(|(_, e)| e.time < xi)
-                            .map(|(i, _)| i + 1)
-                            .unwrap_or(0usize);
-                        self.events.insert(
-                            i,
-                            NoteEvent {
-                                note: 24 - yi,
-                                time: xi,
-                                down: true,
-                            },
-                        );
-                        let i = self
-                            .events
-                            .iter()
-                            .enumerate()
-                            .rev()
-                            .find(|(_, e)| e.time < xi + 4)
-                            .map(|(i, _)| i + 1)
-                            .unwrap_or(0usize);
-                        self.events.insert(
-                            i,
-                            NoteEvent {
-                                note: 24 - yi,
-                                time: xi + 4,
-                                down: false,
-                            },
-                        );
-                    }
-                };
-
                 self.gen_tmp();
-
-                //crate::alert(format!("--{:?}--",self.tmp).as_str());
-                crate::log(format!("--{:?}--", self.events).as_str());
-
-                //.filter(|(i, e)| e.note == 24 - yi && e.time < xi + 4 && e.time > xi - 4)
-                //.collect::<Vec<_>>();
-
-                //if let Some((i, n)) = self
-                //    .notes
-                //    .iter_mut()
-                //    .rev()
-                //    .skip(len - ni - 1)
-                //    .take(4)
-                //    //.inspect(|n| crate::alert(format!("--{:?}--", n).as_str()))
-                //    .enumerate()
-                //    .find(|(_, n)| n.note > 24)
-                //{
-                //    n.note = 24 - yi;
-                //    n.delay = i * 4 + (xi & 0b11);
-                //    //crate::alert(format!("--click{:?}--", n,).as_str());
-                //}
             }
             _ => return false,
         }
@@ -214,18 +265,24 @@ impl Sheet for RedPianoV3 {
     }
 
     fn save(&self) -> String {
-        todo!()
+        serde_json::to_string(&json!({
+            "version": 3,
+            "events": self.events
+        }))
+        .unwrap()
     }
     fn load(&mut self, str: String) {
-        todo!()
+        let SaverV3 { events, version } = serde_json::from_str(&str).unwrap();
+        self.events = events.unwrap();
+        self.gen_tmp();
     }
 
     fn save_comp(&self) -> String {
-        todo!()
+        String::new()
     }
 
     fn add_inst(&mut self, inst: usize, color_s: String) {
-        todo!()
+        //todo!()
     }
 
     fn resize(&mut self, tar: usize) -> usize {
@@ -248,8 +305,13 @@ impl Sheet for RedPianoV3 {
     }
 
     fn key(&mut self, x: usize, y: usize, key: usize) -> Option<(usize, usize)> {
-        //todo!()
-        Some((11, 24 - y))
+        if let Some((i, _)) = KEYM.into_iter().enumerate().find(|(_, n)| *n == key) {
+            if x > 4 {
+                self.click_edit(x - 4, 24 - i);
+            }
+            return Some((self.sel_inst, i));
+        }
+        None
     }
 
     fn export(&self) -> String {
@@ -336,4 +398,9 @@ impl DerefMut for RedPianoV3 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.cd
     }
+}
+#[derive(serde::Deserialize)]
+struct SaverV3 {
+    events: Option<Vec<NoteEvent>>,
+    version: Option<i32>,
 }

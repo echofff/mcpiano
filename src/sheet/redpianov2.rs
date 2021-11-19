@@ -5,6 +5,7 @@ use wasm_bindgen::{throw_str, JsValue, UnwrapThrowExt};
 
 use crate::draw::{Area, Draw};
 use crate::event::{Event, Key, KeyCata};
+use crate::play::KEYM;
 
 use super::{CommonData, Sheet};
 
@@ -559,7 +560,3 @@ impl DerefMut for Track {
         &mut self.notes
     }
 }
-pub const KEYM: [usize; 25] = [
-    192, 9, 49, 81, 50, 87, 69, 52, 82, 53, 84, 89, 55, 85, 56, 73, 57, 79, 80, 173, 219, 61, 221,
-    220, 8,
-];
