@@ -83,15 +83,6 @@ impl Draw {
 
     pub fn vert(&self, xi: usize) {
         self.rect(xi, 0, 1, self.hi, false);
-
-        //let ni = ni * 4 + 4;
-        //(ni..ni + 4)
-        //    .into_iter()
-        //    .zip(BEATS.into_iter())
-        //    .filter(|(_, b)| b & beat != 0)
-        //    .for_each(|(ni, _)| {
-        //        self.rect(ni, 0, 1, len, false);
-        //    });
     }
 
     pub fn down_line(&self, x: usize, y: usize) {
@@ -186,10 +177,7 @@ impl PianoGlobal {
 
     fn draw_hightlight(&self) {
         let len = self.sheet.time();
-        //self.cctx.style_fill(&self.theme.sel);
-        //self.select_hl.iter().for_each(|(ni, beat)| {
-        //    self.cctx.vert(*ni, *beat, len);
-        //});
+
         self.cctx.style_fill(&self.theme.error);
         self.sheet.error.iter().for_each(|x| {
             self.cctx.vert(*x);
@@ -197,10 +185,8 @@ impl PianoGlobal {
 
         self.cctx.style_fill(&self.theme.play);
         let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
-        //self.cctx.vert(ni, beat, len);
 
         self.cctx.style_fill(&self.theme.hover);
-        //let (ni, beat) = ((self.pos.0 >> 2) - 1, 0b1000 >> (self.pos.0 & 0b11));
         self.cctx.vert(self.pos.0);
     }
 }

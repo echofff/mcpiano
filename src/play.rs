@@ -89,31 +89,8 @@ impl Player {
         !self.pause
     }
 
-    //pub fn play_continue(&self) -> bool {
-    //    //self.sheet.time() / 4 > self.play_bt >> 2
-    //}
-
     pub fn play_stage(&mut self) -> bool {
         false
-        //        let (ni, beat) = (self.play_bt >> 2, 0b1000 >> (self.play_bt & 0b11));
-        //
-        //        if self.maxnote > ni {
-        //            self.play_bt += 1;
-        //            self.draw_all();
-        //            self.tracks
-        //                .iter()
-        //                .filter_map(|t| t.get(ni).map(|n| (t.inst, n)))
-        //                .filter(|(_, n)| n.beat & beat != 0)
-        //                .for_each(|(inst, n)| {
-        //                    self.play(inst as u8, n.note);
-        //                });
-        //            true
-        //        } else {
-        //            self.pause = true;
-        //            self.play_bt = 0;
-        //            self.draw_all();
-        //            false
-        //        }
     }
 }
 
