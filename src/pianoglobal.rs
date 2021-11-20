@@ -89,7 +89,7 @@ impl Theme {
             sel: "#2222cc4".into(),
             error: "#ff4444c4".into(),
             play: "#44cc44c4".into(),
-            hover: "#66cccc88".into(),
+            hover: "#cccc6644".into(),
         }
     }
 }

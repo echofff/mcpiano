@@ -168,8 +168,8 @@ impl PianoGlobal {
     fn draw_hover(&self) {
         let (x, y) = self.pos;
         self.cctx.style_fill(&self.theme.hover);
-        self.cctx.rect(x & !0b11, y, 4, 1, false);
-        self.cctx.rect(x, y, 1, 1, false);
+        self.cctx.rect(0, y, self.sheet.time() + 4, 1, false);
+        self.cctx.vert(x);
     }
     fn draw_tracks(&self) {
         self.sheet.draw(&self.cctx);

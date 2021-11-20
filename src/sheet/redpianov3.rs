@@ -117,15 +117,15 @@ impl RedPianoV3 {
             .last();
 
         match (before, after) {
-            (Some((bi, b)), Some((ai, a))) if a + b < 12 => {
+            (Some((bi, b)), Some((ai, a))) if a + b < 6 => {
                 //self.events[bi].up = self.events[ai].up;
                 self.events.remove(ai);
                 self.events.remove(bi);
             }
-            (_, Some((ai, a))) if a < 6 => {
+            (_, Some((ai, a))) if a < 2 => {
                 self.events[ai].time = xi;
             }
-            (Some((bi, b)), _) if b < 6 => {
+            (Some((bi, b)), _) if b < 2 => {
                 self.events[bi].time = xi;
             }
             _ => {
@@ -157,7 +157,7 @@ impl RedPianoV3 {
                     i,
                     NoteEvent {
                         note: 24 - yi,
-                        time: xi + 4,
+                        time: xi + 2,
                         down: false,
                     },
                 );
@@ -188,6 +188,48 @@ impl RedPianoV3 {
         //}
         true
     }
+    fn click_del(&mut self, xi: usize, yi: usize) -> bool {
+        if let Some((note, start, end)) = self
+            .tmp
+            .iter()
+            .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
+        {
+            if end - start <= 2 {
+                self.events.remove(
+                    self.events
+                        .iter()
+                        .enumerate()
+                        .find(|(_, e)| e.note == *note && e.time == *start && e.down)
+                        .unwrap()
+                        .0,
+                );
+                self.events.remove(
+                    self.events
+                        .iter()
+                        .enumerate()
+                        .find(|(_, e)| e.note == *note && e.time == *end && !e.down)
+                        .unwrap()
+                        .0,
+                );
+            } else {
+                if let Some(e) = self
+                    .events
+                    .iter_mut()
+                    .find(|e| e.time == xi && e.note == 24 - yi && e.down)
+                {
+                    e.time += 1
+                } else if let Some(e) = self
+                    .events
+                    .iter_mut()
+                    .find(|e| e.time == xi + 1 && e.note == 24 - yi && !e.down)
+                {
+                    e.time -= 1
+                }
+            }
+        }
+        self.gen_tmp();
+        true
+    }
 }
 
 impl Sheet for RedPianoV3 {
@@ -206,7 +248,7 @@ impl Sheet for RedPianoV3 {
                 yi,
                 ctrl,
                 ..
-            } => return self.click_edit(xi, yi),
+            } => self.click_edit(xi, yi),
             Event {
                 area: Area::EditPlane,
                 cata: KeyCata::Down | KeyCata::Move,
@@ -214,53 +256,13 @@ impl Sheet for RedPianoV3 {
                 xi,
                 yi,
                 ..
-            } => {
-                if let Some((note, start, end)) = self
-                    .tmp
-                    .iter()
-                    .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
-                {
-                    if end - start <= 4 {
-                        self.events.remove(
-                            self.events
-                                .iter()
-                                .enumerate()
-                                .find(|(_, e)| e.note == *note && e.time == *start && e.down)
-                                .unwrap()
-                                .0,
-                        );
-                        self.events.remove(
-                            self.events
-                                .iter()
-                                .enumerate()
-                                .find(|(_, e)| e.note == *note && e.time == *end && !e.down)
-                                .unwrap()
-                                .0,
-                        );
-                    } else {
-                        if let Some(e) = self
-                            .events
-                            .iter_mut()
-                            .find(|e| e.time == xi && e.note == 24 - yi && e.down)
-                        {
-                            e.time += 1
-                        } else if let Some(e) = self
-                            .events
-                            .iter_mut()
-                            .find(|e| e.time == xi + 1 && e.note == 24 - yi && !e.down)
-                        {
-                            e.time -= 1
-                        }
-                    }
-                }
-                self.gen_tmp();
-            }
-            _ => return false,
+            } => self.click_del(xi, yi),
+            _ => false,
         }
-        false
     }
 
     fn draw(&self, c: &Draw) {
+        c.style_fill("#338888");
         for (note, start, end) in self.tmp.iter() {
             c.rect(start + 4, 24 - note + 1, end - start, 1, true);
         }

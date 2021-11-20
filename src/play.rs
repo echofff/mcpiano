@@ -111,6 +111,9 @@ impl PianoGlobal {
             false
         }
     }
+    pub fn set_volumn(&mut self, v: f32) {
+        self.actx.set_volumn(v)
+    }
 }
 
 impl NoteBox {
