@@ -28,32 +28,32 @@ use super::{CommonData, Sheet};
 pub struct RedPianoV3 {
     //start: Vec<NoteDe>,
     //end: Vec<NoteDe>,
-    events: Vec<NoteEvent>,
+    clips: Vec<Clip>,
     len: usize,
 
     cd: CommonData,
-    tmp: Vec<(usize, usize, usize)>,
+    //tmp: Vec<(usize, usize, usize)>,
 }
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-struct NoteEvent {
+struct Clip {
     note: usize,
-    time: usize,
-    down: bool,
-    //down: usize,
-    //up: usize,
+    start: usize,
+    end: usize,
 }
 
-impl NoteEvent {
-    //fn contain(&self, x: usize) -> bool {
-    //    x < self.up && x > self.down
-    //}
-}
+//#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+//struct NoteEvent {
+//    note: usize,
+//    time: usize,
+//    down: bool,
+//    //down: usize,
+//    //up: usize,
+//}
 
 impl RedPianoV3 {
     pub fn new() -> Self {
         RedPianoV3 {
-            events: Vec::new(),
+            clips: Vec::new(),
             //start: vec![NoteDe::new()],
             //end: vec![NoteDe::new()],
             len: 4,
@@ -62,8 +62,7 @@ impl RedPianoV3 {
                 tpm: 2,
                 error: Vec::new(),
             },
-
-            tmp: Vec::new(),
+            //tmp: Vec::new(),
         }
     }
 
@@ -73,101 +72,122 @@ impl RedPianoV3 {
     //fn get_mut<'a>(&'a mut self,time:usize,note:usize) -> Option<&'a mut NoteDe>{
     //    None
     //}
-    fn gen_tmp(&mut self) {
-        self.tmp.clear();
-        let mut t = vec![0usize; 25];
 
-        for e in self.events.iter() {
-            if e.down {
-                t[e.note] = e.time;
-            } else {
-                self.tmp.push((e.note, t[e.note], e.time));
-            };
-        }
-    }
+    //fn gen_tmp(&mut self) {
+    //    self.tmp.clear();
+    //    let mut t = vec![0usize; 25];
+
+    //    for e in self.events.iter() {
+    //        if e.down {
+    //            t[e.note] = e.time;
+    //        } else {
+    //            self.tmp.push((e.note, t[e.note], e.time));
+    //        };
+    //    }
+    //}
     fn click_edit(&mut self, xi: usize, yi: usize) -> bool {
+        let n = 24 - yi;
         self.error = Vec::new();
         //let ni = xi >> 2;
         //let len = self.notes.len();
         self.resize(yi + 1);
         //crate::alert(format!("--click------").as_str());
         //
-        if let Some(i) = self
-            .tmp
+
+        // if is in side a exist
+        if let Some(c) = self
+            .clips
             .iter()
-            .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
+            .find(|c| c.note == n && c.start <= xi && xi < c.end)
         {
             return false;
         }
 
+        // get a clip start after
         let after = self
-            .events
-            .iter()
+            .clips
+            .iter_mut()
             .enumerate()
-            .filter(|(_, e)| e.time > xi && e.down && e.note == 24 - yi)
-            .map(|(i, e)| (i, e.time - xi))
-            .next();
+            .find(|(i, c)| c.note == n && xi <= c.start);
 
+        // get a clip end before
         let before = self
-            .events
-            .iter()
+            .clips
+            .iter_mut()
             .enumerate()
-            .filter(|(_, e)| e.time <= xi && !e.down && e.note == 24 - yi)
-            .map(|(i, e)| (i, xi - e.time))
+            .filter(|(i, c)| c.note == n && c.end < xi)
             .last();
 
+        // + + + + + + +
+        // + - - - - - +
+
         match (before, after) {
-            (Some((bi, b)), Some((ai, a))) if a + b < 6 => {
+            (Some((bi, bc)), Some((ai, ac))) if ac.start - bc.end < 4 => {
                 //self.events[bi].up = self.events[ai].up;
-                self.events.remove(ai);
-                self.events.remove(bi);
+                bc.end = ac.end;
+                self.clips.remove(ai);
             }
-            (_, Some((ai, a))) if a < 2 => {
-                self.events[ai].time = xi;
+            (Some((bi, bc)), _) if xi - bc.end < 2 => {
+                bc.end = xi + 1;
             }
-            (Some((bi, b)), _) if b < 2 => {
-                self.events[bi].time = xi;
+            (_, Some((ai, ac))) if ac.start - xi < 2 => {
+                ac.start = xi;
             }
-            _ => {
-                let i = self
-                    .events
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .find(|(_, e)| e.time < xi)
-                    .map(|(i, _)| i + 1)
-                    .unwrap_or(0usize);
-                self.events.insert(
-                    i,
-                    NoteEvent {
-                        note: 24 - yi,
-                        time: xi,
-                        down: true,
-                    },
-                );
-                let i = self
-                    .events
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .find(|(_, e)| e.time < xi + 4)
-                    .map(|(i, _)| i + 1)
-                    .unwrap_or(0usize);
-                self.events.insert(
-                    i,
-                    NoteEvent {
-                        note: 24 - yi,
-                        time: xi + 2,
-                        down: false,
-                    },
-                );
-            }
+            _ => {}
         };
 
-        self.gen_tmp();
+        //match (before, after) {
+        //    (Some((bi, b)), Some((ai, a))) if a + b < 6 => {
+        //        //self.events[bi].up = self.events[ai].up;
+        //        self.events.remove(ai);
+        //        self.events.remove(bi);
+        //    }
+        //    (_, Some((ai, a))) if a < 2 => {
+        //        self.events[ai].time = xi;
+        //    }
+        //    (Some((bi, b)), _) if b < 2 => {
+        //        self.events[bi].time = xi;
+        //    }
+        //    _ => {
+        //        let i = self
+        //            .events
+        //            .iter()
+        //            .enumerate()
+        //            .rev()
+        //            .find(|(_, e)| e.time < xi)
+        //            .map(|(i, _)| i + 1)
+        //            .unwrap_or(0usize);
+        //        self.events.insert(
+        //            i,
+        //            NoteEvent {
+        //                note: 24 - yi,
+        //                time: xi,
+        //                down: true,
+        //            },
+        //        );
+        //        let i = self
+        //            .events
+        //            .iter()
+        //            .enumerate()
+        //            .rev()
+        //            .find(|(_, e)| e.time < xi + 4)
+        //            .map(|(i, _)| i + 1)
+        //            .unwrap_or(0usize);
+        //        self.events.insert(
+        //            i,
+        //            NoteEvent {
+        //                note: 24 - yi,
+        //                time: xi + 2,
+        //                down: false,
+        //            },
+        //        );
+        //    }
+        //};
+
+        //self.gen_tmp();
 
         //crate::alert(format!("--{:?}--",self.tmp).as_str());
-        crate::log(format!("--{:?}--", self.events).as_str());
+        //crate::log(format!("--{:?}--", self.events).as_str());
 
         //.filter(|(i, e)| e.note == 24 - yi && e.time < xi + 4 && e.time > xi - 4)
         //.collect::<Vec<_>>();
@@ -188,48 +208,48 @@ impl RedPianoV3 {
         //}
         true
     }
-    fn click_del(&mut self, xi: usize, yi: usize) -> bool {
-        if let Some((note, start, end)) = self
-            .tmp
-            .iter()
-            .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
-        {
-            if end - start <= 2 {
-                self.events.remove(
-                    self.events
-                        .iter()
-                        .enumerate()
-                        .find(|(_, e)| e.note == *note && e.time == *start && e.down)
-                        .unwrap()
-                        .0,
-                );
-                self.events.remove(
-                    self.events
-                        .iter()
-                        .enumerate()
-                        .find(|(_, e)| e.note == *note && e.time == *end && !e.down)
-                        .unwrap()
-                        .0,
-                );
-            } else {
-                if let Some(e) = self
-                    .events
-                    .iter_mut()
-                    .find(|e| e.time == xi && e.note == 24 - yi && e.down)
-                {
-                    e.time += 1
-                } else if let Some(e) = self
-                    .events
-                    .iter_mut()
-                    .find(|e| e.time == xi + 1 && e.note == 24 - yi && !e.down)
-                {
-                    e.time -= 1
-                }
-            }
-        }
-        self.gen_tmp();
-        true
-    }
+    //fn click_del(&mut self, xi: usize, yi: usize) -> bool {
+    //    if let Some((note, start, end)) = self
+    //        .tmp
+    //        .iter()
+    //        .find(|(note, start, end)| *note == 24 - yi && *start <= xi && xi < *end)
+    //    {
+    //        if end - start <= 2 {
+    //            self.events.remove(
+    //                self.events
+    //                    .iter()
+    //                    .enumerate()
+    //                    .find(|(_, e)| e.note == *note && e.time == *start && e.down)
+    //                    .unwrap()
+    //                    .0,
+    //            );
+    //            self.events.remove(
+    //                self.events
+    //                    .iter()
+    //                    .enumerate()
+    //                    .find(|(_, e)| e.note == *note && e.time == *end && !e.down)
+    //                    .unwrap()
+    //                    .0,
+    //            );
+    //        } else {
+    //            if let Some(e) = self
+    //                .events
+    //                .iter_mut()
+    //                .find(|e| e.time == xi && e.note == 24 - yi && e.down)
+    //            {
+    //                e.time += 1
+    //            } else if let Some(e) = self
+    //                .events
+    //                .iter_mut()
+    //                .find(|e| e.time == xi + 1 && e.note == 24 - yi && !e.down)
+    //            {
+    //                e.time -= 1
+    //            }
+    //        }
+    //    }
+    //    self.gen_tmp();
+    //    true
+    //}
 }
 
 impl Sheet for RedPianoV3 {
@@ -249,36 +269,37 @@ impl Sheet for RedPianoV3 {
                 ctrl,
                 ..
             } => self.click_edit(xi, yi),
-            Event {
-                area: Area::EditPlane,
-                cata: KeyCata::Down | KeyCata::Move,
-                key: Key::Right,
-                xi,
-                yi,
-                ..
-            } => self.click_del(xi, yi),
+            //Event {
+            //    area: Area::EditPlane,
+            //    cata: KeyCata::Down | KeyCata::Move,
+            //    key: Key::Right,
+            //    xi,
+            //    yi,
+            //    ..
+            //} => self.click_del(xi, yi),
             _ => false,
         }
     }
 
     fn draw(&self, c: &Draw) {
         c.style_fill("#338888");
-        for (note, start, end) in self.tmp.iter() {
+        for Clip { note, start, end } in self.clips.iter() {
             c.rect(start + 4, 24 - note + 1, end - start, 1, true);
         }
     }
 
     fn save(&self) -> String {
-        serde_json::to_string(&json!({
-            "version": 3,
-            "events": self.events
-        }))
-        .unwrap()
+        String::new()
+        //serde_json::to_string(&json!({
+        //    "version": 3,
+        //    "events": self.events
+        //}))
+        //.unwrap()
     }
     fn load(&mut self, str: String) {
-        let SaverV3 { events, version } = serde_json::from_str(&str).unwrap();
-        self.events = events.unwrap();
-        self.gen_tmp();
+        //let SaverV3 { events, version } = serde_json::from_str(&str).unwrap();
+        //self.events = events.unwrap();
+        //self.gen_tmp();
     }
 
     fn save_comp(&self) -> String {
@@ -319,60 +340,61 @@ impl Sheet for RedPianoV3 {
     }
 
     fn export(&mut self) -> String {
-        let mut items = [[Vec::new(), Vec::new()], [Vec::new(), Vec::new()]];
-        let mut time = 0;
-        let mut event = self.events.iter().filter(|e| e.down);
-        while let Some(e) = event.next() {
-            if e.time > time {
-                while e.time - time >= 16 {
-                    items[0][0].add(0, 25);
-                    items[0][1].add(1, 0);
-                    time += 4;
-                }
-                items[0][0].add(0, e.note);
-                items[0][1].add(1, e.time - time);
-                time += 4;
-            } else {
-                crate::alert(format!("Confident at time {}", time).as_str());
-                self.error = vec![time];
-                return String::new();
-            }
-        }
+        String::new()
+        //let mut items = [[Vec::new(), Vec::new()], [Vec::new(), Vec::new()]];
+        //let mut time = 0;
+        //let mut event = self.events.iter().filter(|e| e.down);
+        //while let Some(e) = event.next() {
+        //    if e.time > time {
+        //        while e.time - time >= 16 {
+        //            items[0][0].add(0, 25);
+        //            items[0][1].add(1, 0);
+        //            time += 4;
+        //        }
+        //        items[0][0].add(0, e.note);
+        //        items[0][1].add(1, e.time - time);
+        //        time += 4;
+        //    } else {
+        //        crate::alert(format!("Confident at time {}", time).as_str());
+        //        self.error = vec![time];
+        //        return String::new();
+        //    }
+        //}
 
-        let mut time = 0;
-        let mut event = self.events.iter().filter(|e| !e.down);
-        while let Some(e) = event.next() {
-            if e.time > time {
-                while e.time - time >= 16 {
-                    items[1][0].add(0, 25);
-                    items[1][1].add(1, 0);
-                    time += 4;
-                }
-                items[1][0].add(0, e.note);
-                items[1][1].add(1, e.time - time);
-                time += 4;
-            } else {
-                crate::alert(format!("Confident at time {}", time).as_str());
-                self.error = vec![time];
-                return String::new();
-            }
-        }
-        crate::log(format!("-- {:?}", items).as_str());
+        //let mut time = 0;
+        //let mut event = self.events.iter().filter(|e| !e.down);
+        //while let Some(e) = event.next() {
+        //    if e.time > time {
+        //        while e.time - time >= 16 {
+        //            items[1][0].add(0, 25);
+        //            items[1][1].add(1, 0);
+        //            time += 4;
+        //        }
+        //        items[1][0].add(0, e.note);
+        //        items[1][1].add(1, e.time - time);
+        //        time += 4;
+        //    } else {
+        //        crate::alert(format!("Confident at time {}", time).as_str());
+        //        self.error = vec![time];
+        //        return String::new();
+        //    }
+        //}
+        //crate::log(format!("-- {:?}", items).as_str());
 
-        format!("开始 音符\r\n/give @p minecraft:chest{}\r\n开始 延迟\r\n/give @p minecraft:chest{}\r\n结束 音符\r\n/give @p minecraft:chest{}\r\n结束 延迟\r\n/give @p minecraft:chest{}\r\n",
-                items2String(&mut items[0][0],String::from("start_note")),
-                items2String(&mut items[0][1],String::from("start_note")),
-                items2String(&mut items[1][0],String::from("start_note")),
-                items2String(&mut items[1][1],String::from("start_note")),
-                )
+        //format!("开始 音符\r\n/give @p minecraft:chest{}\r\n开始 延迟\r\n/give @p minecraft:chest{}\r\n结束 音符\r\n/give @p minecraft:chest{}\r\n结束 延迟\r\n/give @p minecraft:chest{}\r\n",
+        //        items2String(&mut items[0][0],String::from("start_note")),
+        //        items2String(&mut items[0][1],String::from("start_note")),
+        //        items2String(&mut items[1][0],String::from("start_note")),
+        //        items2String(&mut items[1][1],String::from("start_note")),
+        //        )
     }
 
     fn play(&self, t: usize) -> Vec<(usize, usize)> {
-        self.tmp
-            .iter()
-            .filter(|(_, start, end)| *start + 1 <= t && t < *end + 1)
-            .map(|(n, _, _)| (11, *n))
-            .collect::<Vec<_>>()
+        //self.tmp
+        //    .iter()
+        //    .filter(|(_, start, end)| *start + 1 <= t && t < *end + 1)
+        //    .map(|(n, _, _)| (11, *n))
+        //    .collect::<Vec<_>>()
     }
 }
 
@@ -413,8 +435,8 @@ impl DerefMut for RedPianoV3 {
         &mut self.cd
     }
 }
-#[derive(serde::Deserialize)]
-struct SaverV3 {
-    events: Option<Vec<NoteEvent>>,
-    version: Option<i32>,
-}
+//#[derive(serde::Deserialize)]
+//struct SaverV3 {
+//    events: Option<Vec<NoteEvent>>,
+//    version: Option<i32>,
+//}
